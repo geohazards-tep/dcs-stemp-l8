@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="application">
   <jobTemplates>
-    <jobTemplate id="template">
-      <streamingExecutable>/application/node/run</streamingExecutable>
+    <jobTemplate id="stemp">
+      <streamingExecutable>/application/stemp/run</streamingExecutable>
     </jobTemplate>
   </jobTemplates>
-    <workflow id="workflow" title="Basic Workflow" abstract="Basic workflow archetype">
+    <workflow id="workflow" title="STEMP" abstract="Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (ASTER, LANDSAT8) generated in GeoTIFF format">
     <workflowVersion>1.0</workflowVersion>
-    <node id="node">
-      <job id="template"/>
+    <node id="node-stemp">
+      <job id="stemp"/>
       <sources>
-        <source refid="string:list">input-1,input-2</source>
+        <source id="input" refid="string:list" scope="runtime" title="LANDSAT8 or TERRA-ASTER input" abstract="L1B LANDSAT8 data or L1T TERRA-ASTER data">input</source>
       </sources>
     </node>
   </workflow>
