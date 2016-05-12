@@ -63,6 +63,9 @@ function main(){
   export MODTRAN_BIN=/opt/MODTRAN-5.4.0/
   export PROCESSING_HOME=${TMPDIR}/PROCESSING
   mkdir -p ${PROCESSING_HOME}
+
+  # temporary
+  cp /data/code/PROCESSING/file_input.cfg ${PROCESSING_HOME}
   # invoke the app with the local staged data
   STEMP_BIN=/data/code/STEMP-1.0
   /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav
