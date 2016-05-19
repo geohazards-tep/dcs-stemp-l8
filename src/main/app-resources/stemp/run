@@ -61,17 +61,29 @@ function main(){
   #esport IDL variable
   export LM_LICENSE_FILE=1700@idl.terradue.int
   export MODTRAN_BIN=/opt/MODTRAN-5.4.0/
-  export PROCESSING_HOME=${TMPDIR}/PROCESSING
-  mkdir -p ${PROCESSING_HOME}
+  # temporary PROCESSING_HOME fixed
+  export PROCESSING_HOME=/data/code/PROCESSING/
+#  export PROCESSING_HOME=${TMPDIR}/PROCESSING
+#  mkdir -p ${PROCESSING_HOME}
 
   # temporary
-  cp /data/code/PROCESSING/file_input.cfg ${PROCESSING_HOME}
+#  cp /data/code/PROCESSING/file_input.cfg ${PROCESSING_HOME}
   # invoke the app with the local staged data
   STEMP_BIN=/data/code/STEMP-1.0
   /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav
+
+  # create quicklooks
+  cd ${PROCESSING_HOME}
+  string_inp=$(head -n 1 file_input.cfg)
+  leng=${#string_inp}
+  gdal_translate -scale -10 10 0 255 -ot Byte -of PNG ${string_inp:0:leng-4}_TEMP.tif ${string_inp:0:leng-4}_TEMP.png
+  listgeo -tfw ${string_inp:0:leng-4}_TEMP.tif
+  mv ${string_inp:0:leng-4}_TEMP.tfw ${string_inp:0:leng-4}_TEMP.pngw
+
   
   # stage-out the results
   ciop-publish -m /data/code/PROCESSING/*TEMP.tif || return $?
+  ciop-publish -m /data/code/PROCESSING/*TEMP.png* || return $?
 }
 
 
