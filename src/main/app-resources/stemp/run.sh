@@ -1,35 +1,8 @@
 #!/bin/bash
 
-# source the ciop functions (e.g. ciop-log, ciop-getparam)
-source ${ciop_job_include}
+source /application/libexec/functions.sh
 
-# define the exit codes
-SUCCESS=0
-ERR_INPUT=10
-ERR_RAS=20
-ERR_AOI=30
-ERR_PUBLISH=40
-# add a trap to exit gracefully
-function cleanExit () {
-
-  local retval=$?
-  local msg=""
-
-  case "$retval" in
-    $SUCCESS) msg="Processing successfully concluded";;
-    $ERR_INPUT) msg="Wrong input. Input data must be L8 or ASTER";;
-    $ERR_RAS) msg="Athmosferic profile is not available";;
-    $ERR_AOI) msg="The selected input file does not contain a correct area to be processed";;
-    $ERR_PUBLISH) msg="Failed results publish";;
-    *) msg="Unknown error";;
-  esac
-  [ "$retval" != "0" ] && ciop-log "ERROR" "Error $retval - $msg, processing aborted" || ciop-log "INFO" "$msg"
-  exit $retval
-}
-
-trap cleanExit EXIT
-
-get_data() {
+function get_data() {
   local ref=$1
   local target=$2
   local local_file
@@ -51,7 +24,7 @@ get_data() {
 }
 
 
-function main(){
+function main() {
 
   # prepare STEMP environment
   
