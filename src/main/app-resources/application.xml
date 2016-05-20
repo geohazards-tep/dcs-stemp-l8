@@ -10,13 +10,13 @@
           <options>
             <option>Etna</option>
             <option>Stromboli</option>
+            <option>Vesuvio Campi Flegrei</option>
             <default>Etna</default>
           </options>
         </parameter>
-        <parameter id="mission" title="Satellite mission" abstract="L1B LANDSAT8 data or L1T TERRA-ASTER data" maxOccurs="1" scope="runtime">
+        <parameter id="mission" title="Mission" abstract="L1B LANDSAT8 data" maxOccurs="1" scope="runtime">
           <options>
             <option>LANDSAT8</option>
-            <option>ASTER</option>
             <default>LANDSAT8</default>
           </options>
         </parameter>

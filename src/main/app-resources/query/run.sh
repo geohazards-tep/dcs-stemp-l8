@@ -36,13 +36,15 @@ function main() {
   [ -z ${startdate} ] && exit $ERR_PARAM
   [ -z ${enddate} ] && exit $ERR_PARAM
  
-  read volcano v_lon v_lat < <( cat ${DB_PATH}/volcanoes | grep ${volcano,,} )
+  IFS=',' read volcano v_lon v_lat station < <( cat ${DB_PATH}/volcanoes | grep ${volcano,,} )
   [ -z ${volcano} ] && exit $ERR_VOLCANO_NOT_FOUND
 
   ciop-log "INFO" "Found volcano "${volcano}" coordinates ${v_lon} ${v_lat}"
 
-  station=$(find_station)
-  [ -z ${station} ] && exit $ERR_STATION_NOT_FOUND
+  if [ -z ${station} ]; then
+    station=$(find_station)
+    [ -z ${station} ] && exit $ERR_STATION_NOT_FOUND
+  fi
   
   opensearch-client \
     -p "start=${startdate}" \
