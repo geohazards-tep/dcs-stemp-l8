@@ -2,7 +2,7 @@
 <application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="application">
   <jobTemplates>
     <jobTemplate id="query">
-      <streamingExecutable>/application/query/run</streamingExecutable>
+      <streamingExecutable>/application/query/run.sh</streamingExecutable>
       <defaultParameters>
         <parameter id="startdate" title="Start date" abstract="Format YYYY-MM-DDThh:mm:ssZ or YYYY-MM-DD" maxOccurs="1" scope="runtime"/>
         <parameter id="enddate" title="End date" abstract="Format YYYY-MM-DDThh:mm:ssZ or YYYY-MM-DD" maxOccurs="1" scope="runtime"/>
@@ -26,7 +26,7 @@
       </defaultJobconf>
     </jobTemplate>
     <jobTemplate id="stemp">
-      <streamingExecutable>/application/stemp/run</streamingExecutable>
+      <streamingExecutable>/application/stemp/run.sh</streamingExecutable>
     </jobTemplate>
   </jobTemplates>
   <workflow id="workflow" title="STEMP" abstract="Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format">
