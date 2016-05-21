@@ -7,7 +7,10 @@ do
     | grep "CIRCLE" | cut -d "'" -f 2 \
     | while read station
   do
-    station_url="http://weather.uwyo.edu/cgi-bin/sounding?region=${region}&TYPE=TEXT%3AUNMERGED&YEAR=2016&MONTH=01&FROM=all&TO=3112&STNM=${station}"
+    # change accordingly the year and month values if a station doesn't provide results
+    year="2016"
+    month="01"
+    station_url="http://weather.uwyo.edu/cgi-bin/sounding?region=${region}&TYPE=TEXT%3AUNMERGED&YEAR=${year}&MONTH=${month}&FROM=all&TO=3112&STNM=${station}"
     read lat lon < <( curl -s "${station_url}" \
       | grep SLON | tr -s " " | cut -d " " -f 4,7 )
     echo ${region} ${station} ${lon} ${lat}
