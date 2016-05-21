@@ -56,6 +56,7 @@ function main() {
     "https://data2.terradue.com/eop/${mission,,}/dataset/search?geom=POINT(${v_lon}%20${v_lat})" \
     self,enddate | tr "," " " | while read self enddate
   do
+    ciop-log "INFO" "Publishing to the stemp node: ${self},${enddate},${station}"
     echo "${self},${enddate},${station}" | ciop-publish -s
   done
 
