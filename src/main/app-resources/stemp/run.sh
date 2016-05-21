@@ -17,15 +17,22 @@ function main() {
   # temporary
   PROCESSING_HOME=/data/code/PROCESSING/
   mkdir -p ${PROCESSING_HOME}
-  
+
+  ciop-log "INFO" "Input product reference: ${product}" 
+  ciop-log "INFO" "Date and time: ${date}" 
+  ciop-log "INFO" "Reference atmospheric station: ${station}" 
+ 
+  ciop-log "INFO" "Getting atmospheric profile ..." 
   getRas ${station} ${date} ${PROCESSING_HOME}
   res=$?
   [ ${res} -ne 0 ] && return ${ERR_GET_RAS}
   
+  ciop-log "INFO" "Getting digital elevation model ..." 
   getDem ${product} ${PROCESSING_HOME}
   res=$?
   [ ${res} -ne 0 ] && return ${ERR_GET_DEM}
   
+  ciop-log "INFO" "Getting input product ..." 
   getData ${product} ${PROCESSING_HOME}
   res=$?
   [ ${res} -ne 0 ] && return ${ERR_GET_DATA}

@@ -39,13 +39,17 @@ function main() {
   IFS=',' read volcano v_lon v_lat station < <( cat ${DB_PATH}/volcanoes | grep ${volcano,,} )
   [ -z ${volcano} ] && exit $ERR_VOLCANO_NOT_FOUND
 
-  ciop-log "INFO" "Found volcano "${volcano}" coordinates ${v_lon} ${v_lat}"
+  ciop-log "INFO" "Volcano name: ${volcano}"
+  ciop-log "INFO" "Volcano coordinates: ${v_lon} ${v_lat}"
 
   if [ -z ${station} ]; then
     station=$(find_station)
     [ -z ${station} ] && exit $ERR_STATION_NOT_FOUND
   fi
+
+  ciop-log "INFO" "Nearest atmosferic station: ${station}"
   
+  # TODO: (1) Check return code (2) No products found
   opensearch-client \
     -p "start=${startdate}" \
     -p "stop=${enddate}" \
