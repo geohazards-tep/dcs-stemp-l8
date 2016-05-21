@@ -50,6 +50,7 @@ function main() {
   ciop-log "INFO" "Nearest atmosferic station: ${station}"
   
   # TODO: (1) Check return code (2) No products found
+  # (3) ingest a LANDSAT8 test sample
   opensearch-client \
     -p "start=${startdate}" \
     -p "stop=${enddate}" \

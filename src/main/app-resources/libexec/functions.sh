@@ -51,8 +51,6 @@ function getDem() {
 
   xsltproc /usr/lib/ciop/xsl/meta2url.xsl ${metalink} | while read link; do
     echo ${link} | tr -d '\r' | ciop-copy -O $target -
-    res=$?
-    [ ${res} -ne 0 ] && return ${res}
   done
 
 }
