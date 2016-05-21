@@ -22,7 +22,9 @@ function cleanExit ()
     $ERR_INVALID_MISSION)   msg="Invalid mission";;
     $ERR_VOLCANO_NOT_FOUND) msg="Volcano not found";;
     $ERR_STATION_NOT_FOUND) msg="Sounding station not found";;
-    $ERR_RAS_NOT_FOUND)     msg="Athmosferic profile not found";;
+    $ERR_GET_DATA)          msg="Error getting the input data";;
+    $ERR_GET_DEM)           msg="Error getting the digital elevation model";;
+    $ERR_GET_RAS)           msg="Error getting the athmosferic profile";;
     $ERR_PUBLISH)           msg="Failed results publish";;
     *)                      msg="Unknown error";;
   esac
@@ -73,5 +75,14 @@ function getData() {
   res=$?
   [ ${res} -ne 0 ] && return ${res}
   echo ${local_file}
+
+}
+
+function getRas() {
+
+  local station=$1
+  local date=$2 
+  local target=$3
+  return 0
 
 }
