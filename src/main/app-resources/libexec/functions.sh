@@ -9,8 +9,10 @@ SUCCESS=0
 ERR_INVALID_MISSION=10
 ERR_VOLCANO_NOT_FOUND=11
 ERR_STATION_NOT_FOUND=12
-ERR_RAS_NOT_FOUND=13
-ERR_PUBLISH=14
+ERR_GET_DATA=13
+ERR_GET_DEM=14
+ERR_GET_RAS=15
+ERR_PUBLISH=255
 
 # add a trap to exit gracefully
 function cleanExit ()
@@ -41,7 +43,7 @@ function getDem() {
 
   service="http://dem.terradue.int:8080/wps/WebProcessingService" 
 
-  wpsclient -a -u "${service}" -p "com.terradue.wps_oozie.process.OozieAbstractAlgorithm" -ILevel0_ref="${ref}" -Iformat=roi_pac -e -op ${target}
+  wpsclient -a -u "${service}" -p "com.terradue.wps_oozie.process.OozieAbstractAlgorithm" -ILevel0_ref="${ref}" -Iformat=roi_pac -e -op ${target} &>/dev/null
   res=$?
   [ ${res} -ne 0 ] && return ${res}
   

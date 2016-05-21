@@ -39,6 +39,7 @@ function main() {
 
   # temporary
 #  cp /data/code/PROCESSING/file_input.cfg ${PROCESSING_HOME}
+  ciop-log "INFO" "Starting STEMP ..." 
   /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav
 
   # create quicklooks
