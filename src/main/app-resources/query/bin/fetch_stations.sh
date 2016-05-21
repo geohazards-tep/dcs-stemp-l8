@@ -7,9 +7,9 @@ do
     | grep "CIRCLE" | cut -d "'" -f 2 \
     | while read station
   do
-    station_url="http://weather.uwyo.edu/cgi-bin/sounding?region=${region}&TYPE=TEXT%3AUNMERGED&YEAR=2016&MONTH=01&FROM=0100&TO=1512&STNM=${station}"
+    station_url="http://weather.uwyo.edu/cgi-bin/sounding?region=${region}&TYPE=TEXT%3AUNMERGED&YEAR=2016&MONTH=01&FROM=all&TO=3112&STNM=${station}"
     read lat lon < <( curl -s "${station_url}" \
       | grep SLON | tr -s " " | cut -d " " -f 4,7 )
-    echo ${station} ${lon} ${lat}
+    echo ${region} ${station} ${lon} ${lat}
   done
 done

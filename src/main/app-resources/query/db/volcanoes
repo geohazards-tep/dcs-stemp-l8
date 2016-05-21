@@ -1,4 +1,4 @@
 # volcano,lon,lat[,station]
-etna,14.9934,37.7510
-stromboli,15.2130,38.7890
-vesuvio campi flegrei,14.1390,40.8270
+etna,14.9934,37.7510,16429
+stromboli,15.2130,38.7890,16429
+vesuvio campi flegrei,14.1390,40.8270,16245

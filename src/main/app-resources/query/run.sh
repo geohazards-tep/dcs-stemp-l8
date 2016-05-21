@@ -10,7 +10,7 @@ function find_station() {
   v_lat=$2
 
   # simple searching function, it could be improved in performance
-  cat ${DB_PATH}/sounding_stations | while read station_id s_lon s_lat
+  cat ${DB_PATH}/sounding_stations | while read region station_id s_lon s_lat
   do
     dist=$( haversine $v_lon $v_lat $s_lon $s_lat )
 
