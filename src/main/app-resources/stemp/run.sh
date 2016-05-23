@@ -12,6 +12,7 @@ function main() {
   local product=$1
   local date=$2
   local station=$3
+  local region=$4
 
   # preparing STEMP environment
   # temporary
@@ -23,7 +24,7 @@ function main() {
   ciop-log "INFO" "Reference atmospheric station: ${station}" 
  
   ciop-log "INFO" "Getting atmospheric profile ..." 
-  getRas ${station} ${date} ${PROCESSING_HOME}
+  getRas ${date} ${station} ${region} ${PROCESSING_HOME}
   res=$?
   [ ${res} -ne 0 ] && return ${ERR_GET_RAS}
   
@@ -55,9 +56,9 @@ function main() {
   ciop-publish -m ${PROCESSING_HOME}/*TEMP.png* || return $?
 }
 
-while IFS=',' read product date station
+while IFS=',' read product date station region
 do
-    main ${product} ${date} ${station}
+    main ${product} ${date} ${station} ${region}
     res=$?
     [ "${res}" != "0" ] && exit ${res}
 done

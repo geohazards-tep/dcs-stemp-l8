@@ -79,10 +79,28 @@ function getData() {
 }
 
 function getRas() {
+      
+  local date=$1
+  local station=$2
+  local region=$3
+  local target=$4
 
-  local station=$1
-  local date=$2 
-  local target=$3
-  return 0
+  # UTC format for date
+  local year=${date:0:4}
+  local month=${date:5:2}
+  local day=${date:8:2}
+  local hour=${date:11:2}
+
+  if [ ${hour} -le "17" ]; then
+    hour="00"
+  else
+    hour="12"
+  fi
+
+  local sounding_url="http://weather.uwyo.edu/cgi-bin/sounding?region=${region}&TYPE=TEXT%3ALIST&YEAR=${year}&MONTH=${month}&FROM=${day}${hour}&TO=${day}${hour}&STNM=${station}"
+
+  curl -s -o ${target}/RAW${year}${month}${hour}_${station}.txt "${sounding_url}"
+  res=$?
+  [ ${res} -ne 0 ] && return ${res}
 
 }
