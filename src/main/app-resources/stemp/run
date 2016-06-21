@@ -49,15 +49,10 @@ function main(){
   cp /data/code/INPUT_SRF/*de*.tif  ${PROCESSING_HOME}
 
   mkdir -p ${TMPDIR}/INPUT_SRF
-  cp /data/code/INPUT_SRF/* ${TMPDIR}/INPUT_SRF/.
-
-  #cp /data/code/PROCESSING_24mag/*  ${PROCESSING_HOME}
-  #cp /data/code/INPUT_SRF/* ${TMPDIR}/INPUT_SRF
-  #cp /data/code/PROCESSING/file_input.cfg ${PROCESSING_HOME}
+  cp /application/aux/* ${TMPDIR}/INPUT_SRF/.
   
   # invoke the STEMP processor
-#  /usr/local/bin/idl -rt=${STEMP_BIN}/run_modtran.sav -IDL_DEVICE Z
-  /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav 
+  /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav -IDL_DEVICE Z 
   
   # create quicklooks
   cd ${PROCESSING_HOME}
@@ -68,8 +63,8 @@ function main(){
   mv ${string_inp:0:leng-4}_TEMP.tfw ${string_inp:0:leng-4}_TEMP.pngw
   
   # stage-out the results
-  ciop-publish -m  ${PROCESSING_HOME}/*TEMP.tif || return $?
-  ciop-publish -m  ${PROCESSING_HOME}/*TEMP.png* || return $?
+  ciop-publish -m ${PROCESSING_HOME}/*TEMP.tif || return $?
+  ciop-publish -m ${PROCESSING_HOME}/*TEMP.png* || return $?
 }
 
 
