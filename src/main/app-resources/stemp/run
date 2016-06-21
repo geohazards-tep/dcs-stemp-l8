@@ -39,16 +39,25 @@ function main(){
   export LM_LICENSE_FILE=1700@idl.terradue.int
   export MODTRAN_BIN=/opt/MODTRAN-5.4.0/
   export STEMP_BIN=/data/code/STEMP-1.0
-  export PROCESSING_HOME=/tmp/mytest
-  #export PROCESSING_HOME=${TMPDIR}/PROCESSING
-  #mkdir -p ${PROCESSING_HOME}
-  #mkdir -p ${TMPDIR}/INPUT_SRF
+#  export PROCESSING_HOME=/tmp/mytest
+  export PROCESSING_HOME=${TMPDIR}/PROCESSING
+  mkdir -p ${PROCESSING_HOME}
+   ln -sf /opt/MODTRAN-5.4.0/Mod5.4.0tag/DATA ${PROCESSING_HOME}/DATA
+  # temporary
+  cp /data/code/APPO/file_input.cfg ${PROCESSING_HOME}
+  cp /data/code/APPO/* ${PROCESSING_HOME}
+  cp /data/code/INPUT_SRF/*de*.tif  ${PROCESSING_HOME}
+
+  mkdir -p ${TMPDIR}/INPUT_SRF
+  cp /data/code/INPUT_SRF/* ${TMPDIR}/INPUT_SRF/.
+
   #cp /data/code/PROCESSING_24mag/*  ${PROCESSING_HOME}
   #cp /data/code/INPUT_SRF/* ${TMPDIR}/INPUT_SRF
   #cp /data/code/PROCESSING/file_input.cfg ${PROCESSING_HOME}
   
   # invoke the STEMP processor
-  /usr/local/bin/idl -rt=${STEMP_BIN}/run_modtran.sav -IDL_DEVICE Z
+#  /usr/local/bin/idl -rt=${STEMP_BIN}/run_modtran.sav -IDL_DEVICE Z
+  /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav 
   
   # create quicklooks
   cd ${PROCESSING_HOME}
@@ -59,8 +68,8 @@ function main(){
   mv ${string_inp:0:leng-4}_TEMP.tfw ${string_inp:0:leng-4}_TEMP.pngw
   
   # stage-out the results
-  ciop-publish -m /data/code/PROCESSING/*TEMP.tif || return $?
-  ciop-publish -m /data/code/PROCESSING/*TEMP.png* || return $?
+  ciop-publish -m  ${PROCESSING_HOME}/*TEMP.tif || return $?
+  ciop-publish -m  ${PROCESSING_HOME}/*TEMP.png* || return $?
 }
 
 
