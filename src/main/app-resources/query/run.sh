@@ -50,6 +50,7 @@ function main() {
   fi
 
   ciop-log "INFO" "Nearest atmosferic station: ${station}"
+  ciop-log "INFO" "Geometry in WKT: ${geom}"
  
   # TODO: (1) Check return code (2) No products found
   opensearch-client \
