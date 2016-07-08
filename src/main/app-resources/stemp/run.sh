@@ -13,15 +13,18 @@ function main() {
   local date=$2
   local station=$3
   local region=$4
+  local geom=$5
 
   # preparing STEMP environment
-  # temporary
-  PROCESSING_HOME=/data/code/PROCESSING/
+  export PROCESSING_HOME=${TMPDIR}/PROCESSING
   mkdir -p ${PROCESSING_HOME}
+  ln -sf /opt/MODTRAN-5.4.0/Mod5.4.0tag/DATA ${PROCESSING_HOME}/DATA
 
   ciop-log "INFO" "Input product reference: ${product}" 
   ciop-log "INFO" "Date and time: ${date}" 
   ciop-log "INFO" "Reference atmospheric station: ${station}" 
+  ciop-log "INFO" "Reference region: ${region}" 
+  ciop-log "INFO" "Geometry in WKT format: ${geom}" 
  
   ciop-log "INFO" "Getting atmospheric profile ..." 
   getRas ${date} ${station} ${region} ${PROCESSING_HOME}
@@ -37,6 +40,10 @@ function main() {
   getData ${product} ${PROCESSING_HOME}
   res=$?
   [ ${res} -ne 0 ] && return ${ERR_GET_DATA}
+
+  ls -l ${PROCESSING_HOME}
+
+  exit 0
 
   # temporary
 #  cp /data/code/PROCESSING/file_input.cfg ${PROCESSING_HOME}
@@ -56,9 +63,9 @@ function main() {
   ciop-publish -m ${PROCESSING_HOME}/*TEMP.png* || return $?
 }
 
-while IFS=',' read product date station region
+while IFS=',' read product date station region geom
 do
-    main ${product} ${date} ${station} ${region}
+    main ${product} ${date} ${station} ${region} ${geom}
     res=$?
     [ "${res}" != "0" ] && exit ${res}
 done

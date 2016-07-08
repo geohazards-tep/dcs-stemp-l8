@@ -28,10 +28,10 @@ function find_station() {
 
 function main() {
 
-  startdate="$(ciop-getparam startdate)"
-  enddate="$(ciop-getparam enddate)"
-  volcano="$(ciop-getparam volcano)"
-  mission="$(ciop-getparam mission)"
+  local startdate="$(ciop-getparam startdate)"
+  local enddate="$(ciop-getparam enddate)"
+  local volcano="$(ciop-getparam volcano)"
+  local mission="$(ciop-getparam mission)"
 
   [ -z ${startdate} ] && exit $ERR_PARAM
   [ -z ${enddate} ] && exit $ERR_PARAM
@@ -41,6 +41,8 @@ function main() {
 
   ciop-log "INFO" "Volcano name: ${volcano}"
   ciop-log "INFO" "Volcano coordinates: ${v_lon} ${v_lat}"
+  
+  local geom="POINT(${v_lon}%20${v_lat}"
 
   if [ -z ${station} ]; then
     station=$(find_station)
@@ -48,17 +50,18 @@ function main() {
   fi
 
   ciop-log "INFO" "Nearest atmosferic station: ${station}"
-  
+ 
   # TODO: (1) Check return code (2) No products found
-  # (3) ingest a LANDSAT8 test sample
   opensearch-client \
     -p "start=${startdate}" \
     -p "stop=${enddate}" \
-    "https://data2.terradue.com/eop/${mission,,}/dataset/search?geom=POINT(${v_lon}%20${v_lat})" \
+    "https://data2.terradue.com/eop/${mission,,}/dataset/search?geom=${geom}" \
     self,enddate | tr "," " " | while read self enddate
   do
-    ciop-log "INFO" "Publishing to the stemp node: ${self},${enddate},${station}"
-    echo "${self},${enddate},${station}" | ciop-publish -s
+
+    ciop-log "INFO" "Publishing to the stemp node: ${self},${enddate},${station},${volcano},${geom}"
+    echo "${self},${enddate},${station},${volcano},${geom}" | ciop-publish -s
+
   done
 
 } 

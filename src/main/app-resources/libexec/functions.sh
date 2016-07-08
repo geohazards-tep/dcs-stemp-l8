@@ -38,12 +38,12 @@ trap cleanExit EXIT
 
 function getDem() {
 
-  local ref=$1 
+  local geom=$1 
   local target=$2
 
-  service="http://dem.terradue.int:8080/wps/WebProcessingService" 
+  service="http://10.16.10.57:8080/wps/WebProcessingService" 
 
-  wpsclient -a -u "${service}" -p "com.terradue.wps_oozie.process.OozieAbstractAlgorithm" -ILevel0_ref="${ref}" -Iformat=roi_pac -e -op ${target} &>/dev/null
+  wpsclient -a -u "${service}" -p "com.terradue.wps_oozie.process.OozieAbstractAlgorithm" -Iwkt="${geom}" -e -op ${target} &>/dev/null
   res=$?
   [ ${res} -ne 0 ] && return ${res}
   
@@ -65,7 +65,7 @@ function getData() {
 
   [ "${ref:0:4}" == "file" ] || [ "${ref:0:1}" == "/" ] && enclosure=${ref}
 
-  [ -z "$enclosure" ] && enclosure=$( opensearch-client "${ref}" enclosure )
+  [ -z "$enclosure" ] && enclosure=$( url_resolver "${ref}" )
   res=$?
   enclosure=$( echo ${enclosure} | tail -1 )
   [ $res -eq 0 ] && [ -z "${enclosure}" ] && return ${ERR_GETDATA}
@@ -104,3 +104,21 @@ function getRas() {
   [ ${res} -ne 0 ] && return ${res}
 
 }
+
+function url_resolver() {
+
+  local url=""
+  local reference="$1"
+  
+  read identifier path < <( opensearch-client -m EOP  "${reference}" identifier,wrsLongitudeGrid | tr "," " " )
+  [ -z "${path}" ] && path="$( echo ${identifier} | cut -c 4-6)"
+  row="$( echo ${identifier} | cut -c 7-9)"
+
+  url="http://storage.googleapis.com/earthengine-public/landsat/L8/${path}/${row}/${identifier}.tar.bz"
+
+  [ -z "$( curl -s --head "${url}" | head -n 1 | grep "HTTP/1.[01] [23].." )" ] && return 1
+
+  echo "${url}"
+}
+
+
