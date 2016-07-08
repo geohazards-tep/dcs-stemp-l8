@@ -15,9 +15,8 @@ function main() {
   local volcano=$4
   local geom=$5
 
-  ciop-log "INFO" "------------------------------------------------------------"
   ciop-log "INFO" "**** STEMP node ****"
-  ciop-log "INFO" ""
+  ciop-log "INFO" "------------------------------------------------------------"
   ciop-log "INFO" "Input product reference: ${ref}" 
   ciop-log "INFO" "Date and time: ${date}" 
   ciop-log "INFO" "Reference atmospheric station: ${station}" 
