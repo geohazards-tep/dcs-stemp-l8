@@ -54,7 +54,7 @@ function main() {
 
   ciop-log "INFO" "Opensearch query: opensearch-client -p \"start=${startdate}\" -p \"stop=${enddate}\" \"https://data2.terradue.com/eop/${mission,,}/dataset/search?geom=${geom}\""
  
-  # TODO: (1) Check return code (2) No products found
+  # TODO: (1) Check return code (2)
   opensearch-client \
     -p "start=${startdate}" \
     -p "stop=${enddate}" \

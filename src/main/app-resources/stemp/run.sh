@@ -43,6 +43,12 @@ function main() {
   res=$?
   [ "${res}" -ne "0" ] && return ${ERR_GET_DATA}
   ciop-log "INFO" "Input product downloaded" 
+
+  ciop-log "INFO" "Uncompressing product ..." 
+  tar xjf ${product}
+  res=$?
+  [ "${res}" -ne "0" ] && return ${ERR_GET_DATA}
+  ciop-log "INFO" "Product uncompressed" 
  
   ciop-log "INFO" "Preparing file_input.cfg ..." 
  
