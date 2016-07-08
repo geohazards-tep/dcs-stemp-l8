@@ -9,10 +9,10 @@ export PROCESSING_HOME=${TMPDIR}/PROCESSING
 
 function main() {
 
-  local product=$1
+  local ref=$1
   local date=$2
   local station=$3
-  local region=$4
+  local volcano=$4
   local geom=$5
 
   # preparing STEMP environment
@@ -20,28 +20,43 @@ function main() {
   mkdir -p ${PROCESSING_HOME}
   ln -sf /opt/MODTRAN-5.4.0/Mod5.4.0tag/DATA ${PROCESSING_HOME}/DATA
 
-  ciop-log "INFO" "Input product reference: ${product}" 
+  ciop-log "INFO" "Input product reference: ${ref}" 
   ciop-log "INFO" "Date and time: ${date}" 
   ciop-log "INFO" "Reference atmospheric station: ${station}" 
-  ciop-log "INFO" "Reference region: ${region}" 
+  ciop-log "INFO" "Volcano name: ${volcano}" 
   ciop-log "INFO" "Geometry in WKT format: ${geom}" 
  
   ciop-log "INFO" "Getting atmospheric profile ..." 
-  getRas ${date} ${station} ${region} ${PROCESSING_HOME}
+  local profile=$( getRas "${date}" "${station}" "${volcano}" "${PROCESSING_HOME}")
   res=$?
-  [ ${res} -ne 0 ] && return ${ERR_GET_RAS}
+  [ "${res}" -ne "0" ] && return ${ERR_GET_RAS}
+  ciop-log "INFO" "Atmospheric profile downloaded" 
   
-  ciop-log "INFO" "Getting digital elevation model ..." 
-  getDem ${product} ${PROCESSING_HOME}
-  res=$?
-  [ ${res} -ne 0 ] && return ${ERR_GET_DEM}
+  ciop-log "INFO" "Getting Digital Elevation Model ..." 
+  local dem=$( getDem "${geom}" "${PROCESSING_HOME}" )
+  #res=$?
+  [ "${res}" -ne "0" ] && return ${ERR_GET_DEM}
+  ciop-log "INFO" "[DONE] Digital Elevation Model downloaded" 
   
   ciop-log "INFO" "Getting input product ..." 
-  getData ${product} ${PROCESSING_HOME}
+  local product=$( getData "${ref}" "${PROCESSING_HOME}" )
   res=$?
-  [ ${res} -ne 0 ] && return ${ERR_GET_DATA}
+  [ "${res}" -ne "0" ] && return ${ERR_GET_DATA}
+  ciop-log "INFO" "Input product downloaded" 
+ 
+  ciop-log "INFO" "Preparing file_input.cfg ..." 
+ 
+  basename ${product} >> ${PROCESSING_HOME}/file_input.cfg
+  basename ${profile} >> ${PROCESSING_HOME}/file_input.cfg
+  basename ${dem} >> ${PROCESSING_HOME}/file_input.cfg
+  basename ${volcano} >> ${PROCESSING_HOME}/file_input.cfg
 
-  ls -l ${PROCESSING_HOME}
+  ciop-log "INFO" "file_input.cfg content:"
+
+  cat ${PROCESSING_HOME}/file_input.cfg 1>&2
+
+  ciop-log "INFO" "PROCESSING_HOME content:"
+  ls -l ${PROCESSING_HOME} 1>&2
 
   exit 0
 
@@ -63,9 +78,9 @@ function main() {
   ciop-publish -m ${PROCESSING_HOME}/*TEMP.png* || return $?
 }
 
-while IFS=',' read product date station region geom
+while IFS=',' read product date station volcano geom
 do
-    main ${product} ${date} ${station} ${region} ${geom}
+    main "${product}" "${date}" "${station}" "${volcano}" "${geom}"
     res=$?
     [ "${res}" != "0" ] && exit ${res}
 done

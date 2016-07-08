@@ -42,7 +42,7 @@ function main() {
   ciop-log "INFO" "Volcano name: ${volcano}"
   ciop-log "INFO" "Volcano coordinates: ${v_lon} ${v_lat}"
   
-  local geom="POINT(${v_lon}%20${v_lat}"
+  local geom="POINT(${v_lon} ${v_lat})"
 
   if [ -z ${station} ]; then
     station=$(find_station)
@@ -51,6 +51,8 @@ function main() {
 
   ciop-log "INFO" "Nearest atmosferic station: ${station}"
   ciop-log "INFO" "Geometry in WKT: ${geom}"
+
+  ciop-log "INFO" "Opensearch query: opensearch-client -p \"start=${startdate}\" -p \"stop=${enddate}\" \"https://data2.terradue.com/eop/${mission,,}/dataset/search?geom=${geom}\""
  
   # TODO: (1) Check return code (2) No products found
   opensearch-client \

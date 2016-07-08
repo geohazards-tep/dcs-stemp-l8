@@ -27,6 +27,9 @@
     </jobTemplate>
     <jobTemplate id="stemp">
       <streamingExecutable>/application/stemp/run.sh</streamingExecutable>
+      <defaultJobconf>
+        <property id="mapred.task.timeout">3600000</property>
+      </defaultJobconf>
     </jobTemplate>
   </jobTemplates>
   <workflow id="workflow" title="STEMP" abstract="Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format">

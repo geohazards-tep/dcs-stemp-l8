@@ -41,14 +41,25 @@ function getDem() {
   local geom=$1 
   local target=$2
 
-  service="http://10.16.10.57:8080/wps/WebProcessingService" 
+  endpoint="http://10.16.10.61:8080/wps/WebProcessingService" 
 
-  wpsclient -a -u "${service}" -p "com.terradue.wps_oozie.process.OozieAbstractAlgorithm" -Iwkt="${geom}" -e -op ${target} &>/dev/null
+  ciop-log "INFO" "[getDem function] WPS service endpoint: ${endpoint} "
+  ciop-log "INFO" "[getDem function] WTK input: ${geom} "
+  ciop-log "INFO" "[getDem function] Starting WPS remote service ..."
+  
+  wpsclient -a -u "${endpoint}" -p "com.terradue.wps_oozie.process.OozieAbstractAlgorithm" -Iwkt="${geom}" -e -op ${target} &>/dev/null
   res=$?
+
+  ciop-log "INFO" "[getDem function] WPS request completed with return code: ${res}"
+
   [ ${res} -ne 0 ] && return ${res}
+  
+  ciop-log "INFO" "[getDem function] Extracting metalink ..."
   
   metalink=$(cat ${target}/response.xml | xsltproc /usr/lib/ciop/xsl/wps2meta.xsl - | sed 's#\(.*OPEN\).*#\1#g')
 
+  ciop-log "INFO" "[getDem function] Metalink: ${metalink}"
+  
   xsltproc /usr/lib/ciop/xsl/meta2url.xsl ${metalink} | while read link; do
     echo ${link} | tr -d '\r' | ciop-copy -O $target -
   done
@@ -71,6 +82,8 @@ function getData() {
   [ $res -eq 0 ] && [ -z "${enclosure}" ] && return ${ERR_GETDATA}
   [ $res -ne 0 ] && enclosure=${ref}
 
+  ciop-log "INFO" "[getData function] Data url: ${enclosure}"
+  
   local_file="$( echo ${enclosure} | ciop-copy -f -U -O ${target} - 2> /dev/null )"
   res=$?
   [ ${res} -ne 0 ] && return ${res}
@@ -99,10 +112,16 @@ function getRas() {
 
   local sounding_url="http://weather.uwyo.edu/cgi-bin/sounding?region=${region}&TYPE=TEXT%3ALIST&YEAR=${year}&MONTH=${month}&FROM=${day}${hour}&TO=${day}${hour}&STNM=${station}"
 
-  curl -s -o ${target}/RAW${year}${month}${hour}_${station}.txt "${sounding_url}"
-  res=$?
-  [ ${res} -ne 0 ] && return ${res}
+  ciop-log "INFO" "[getRas function] sounding_url: ${sounding_url} "
 
+  curl -s -o ${target}/RAW${year}${month}${day}${hour}_${station}.txt "${sounding_url}"
+  res=$?
+  
+  ciop-log "INFO" "[getRas function] curl return code: ${res}"
+  
+  [ ${res} -ne 0 ] && return ${res}
+  
+  echo ${target}/RAW${year}${month}${day}${hour}_${station}.txt
 }
 
 function url_resolver() {
@@ -120,5 +139,3 @@ function url_resolver() {
 
   echo "${url}"
 }
-
-
