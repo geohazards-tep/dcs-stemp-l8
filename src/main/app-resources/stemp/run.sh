@@ -10,10 +10,11 @@ export PROCESSING_HOME=${TMPDIR}/PROCESSING
 function main() {
 
   local ref=$1
-  local date=$2
-  local station=$3
-  local volcano=$4
-  local geom=$5
+  local identifier=$2
+  local date=$3
+  local station=$4
+  local volcano=$5
+  local geom=$6
 
   ciop-log "INFO" "------------------------------------------------------------"
   ciop-log "INFO" "**** STEMP node ****"
@@ -52,14 +53,14 @@ function main() {
   ciop-log "INFO" "------------------------------------------------------------"
 
   ciop-log "INFO" "Uncompressing product" 
-  tar xjf ${product} -C ${PROCESSING_HOME}
+  tar xjf ${product} -C ${PROCESSING_HOME}/${identifier}
   res=$?
   [ "${res}" -ne "0" ] && return ${ERR_GET_DATA}
   ciop-log "INFO" "Product uncompressed"
   ciop-log "INFO" "------------------------------------------------------------"
  
   ciop-log "INFO" "Preparing file_input.cfg" 
-  basename ${product} >> ${PROCESSING_HOME}/file_input.cfg
+  basename ${identifier} >> ${PROCESSING_HOME}/file_input.cfg
   basename ${profile} >> ${PROCESSING_HOME}/file_input.cfg
   basename ${dem} >> ${PROCESSING_HOME}/file_input.cfg
   basename ${volcano} >> ${PROCESSING_HOME}/file_input.cfg
@@ -110,9 +111,9 @@ function main() {
   ciop-log "INFO" "**** STEMP node finished ****"
 }
 
-while IFS=',' read product date station volcano geom
+while IFS=',' read ref identifier date station volcano geom
 do
-    main "${product}" "${date}" "${station}" "${volcano}" "${geom}"
+    main "${ref}" "${identifier}" "${date}" "${station}" "${volcano}" "${geom}"
     res=$?
     [ "${res}" != "0" ] && exit ${res}
 done

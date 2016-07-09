@@ -54,16 +54,16 @@ function main() {
 
   ciop-log "INFO" "Opensearch query: opensearch-client -p \"start=${startdate}\" -p \"stop=${enddate}\" \"https://data2.terradue.com/eop/${mission,,}/dataset/search?geom=${geom}\""
  
-  # TODO: (1) Check return code (2)
+  # TODO: (1) Check return code of the opensearch-client
   opensearch-client \
     -p "start=${startdate}" \
     -p "stop=${enddate}" \
     "https://data2.terradue.com/eop/${mission,,}/dataset/search?geom=${geom}" \
-    self,enddate | tr "," " " | while read self enddate
+    self,identifier,enddate | tr "," " " | while read self identifier enddate
   do
 
     ciop-log "INFO" "Publishing to the stemp node: ${self},${enddate},${station},${volcano},${geom}"
-    echo "${self},${enddate},${station},${volcano},${geom}" | ciop-publish -s
+    echo "${self},${identifier},${enddate},${station},${volcano},${geom}" | ciop-publish -s
 
   done
 
