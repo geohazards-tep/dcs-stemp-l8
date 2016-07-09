@@ -41,20 +41,20 @@ function getDem() {
   local geom=$1 
   local target=$2
 
-  endpoint="http://10.16.10.61:8080/wps/WebProcessingService" 
+  endpoint="http://dem-90m-wkt.platform.terradue.int:8080/wps/WebProcessingService" 
 
-  ciop-log "INFO" "[getDem function] WPS service endpoint: ${endpoint} "
+  ciop-log "INFO" "[getDem function] DEM WPS service endpoint: ${endpoint} "
   ciop-log "INFO" "[getDem function] WTK input: ${geom} "
-  ciop-log "INFO" "[getDem function] Starting WPS remote service ..."
+  ciop-log "INFO" "[getDem function] Starting DEM WPS remote service"
   
   wpsclient -a -u "${endpoint}" -p "com.terradue.wps_oozie.process.OozieAbstractAlgorithm" -Iwkt="${geom}" -e -op ${target} &>/dev/null
   res=$?
 
-  ciop-log "INFO" "[getDem function] WPS request completed with return code: ${res}"
+  ciop-log "INFO" "[getDem function] DEM WPS request completed with return code: ${res}"
 
   [ ${res} -ne 0 ] && return ${res}
   
-  ciop-log "INFO" "[getDem function] Extracting metalink ..."
+  ciop-log "INFO" "[getDem function] Extracting metalink"
   
   metalink=$(cat ${target}/response.xml | xsltproc /usr/lib/ciop/xsl/wps2meta.xsl - | sed 's#\(.*OPEN\).*#\1#g')
 
