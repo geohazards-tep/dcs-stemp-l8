@@ -52,9 +52,11 @@ function main() {
   ciop-log "INFO" "------------------------------------------------------------"
 
   ciop-log "INFO" "Uncompressing product" 
+  mkdir -p ${PROCESSING_HOME}/${identifier}
+  # TODO: manage different compress formats
   tar xjf ${product} -C ${PROCESSING_HOME}/${identifier}
   res=$?
-  [ "${res}" -ne "0" ] && return ${ERR_GET_DATA}
+  [ "${res}" -ne "0" ] && return ${$ERR_UNCOMP}
   ciop-log "INFO" "Product uncompressed"
   ciop-log "INFO" "------------------------------------------------------------"
  
@@ -99,7 +101,7 @@ function main() {
   ciop-log "INFO" "Staging-out results ..."
   ciop-publish -m ${PROCESSING_HOME}/*TEMP.tif || return $?
   ciop-publish -m ${PROCESSING_HOME}/*TEMP.png* || return $?
-  [ "${res}" -ne "0" ] && return ${ERR_GET_DEM}
+  [ "${res}" -ne "0" ] && return ${ERR_PUBLISH}
   
   ciop-log "INFO" "Results staged out"
   ciop-log "INFO" "------------------------------------------------------------"

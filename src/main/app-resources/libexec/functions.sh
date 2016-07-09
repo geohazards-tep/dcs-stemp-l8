@@ -12,6 +12,7 @@ ERR_STATION_NOT_FOUND=12
 ERR_GET_DATA=13
 ERR_GET_DEM=14
 ERR_GET_RAS=15
+ERR_UNCOMP=254
 ERR_PUBLISH=255
 
 # add a trap to exit gracefully
@@ -27,6 +28,7 @@ function cleanExit ()
     $ERR_GET_DATA)          msg="Error getting the input data";;
     $ERR_GET_DEM)           msg="Error getting the digital elevation model";;
     $ERR_GET_RAS)           msg="Error getting the athmosferic profile";;
+    $ERR_UNCOMP)            msg="Failed uncompressing product";;
     $ERR_PUBLISH)           msg="Failed results publish";;
     *)                      msg="Unknown error";;
   esac
