@@ -62,7 +62,7 @@ function main() {
     self,identifier,enddate | tr "," " " | while read self identifier enddate
   do
 
-    ciop-log "INFO" "Publishing to the stemp node: ${self},${enddate},${station},${volcano},${geom}"
+    ciop-log "INFO" "Publishing to the stemp node: ${self},${identifier},${enddate},${station},${volcano},${geom}"
     echo "${self},${identifier},${enddate},${station},${volcano},${geom}" | ciop-publish -s
 
   done
