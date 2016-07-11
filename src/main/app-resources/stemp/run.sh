@@ -13,14 +13,15 @@ function main() {
   local identifier=$2
   local date=$3
   local station=$4
-  local volcano=$5
-  local geom=$6
+  local region=$5
+  local volcano=$6
+  local geom=$7
 
   ciop-log "INFO" "**** STEMP node ****"
   ciop-log "INFO" "------------------------------------------------------------"
   ciop-log "INFO" "Input product reference: ${ref}" 
   ciop-log "INFO" "Date and time: ${date}" 
-  ciop-log "INFO" "Reference atmospheric station: ${station}" 
+  ciop-log "INFO" "Reference atmospheric station: ${station}, ${region}" 
   ciop-log "INFO" "Volcano name: ${volcano}" 
   ciop-log "INFO" "Geometry in WKT format: ${geom}"
   ciop-log "INFO" "------------------------------------------------------------"
@@ -31,7 +32,7 @@ function main() {
   ln -sf /opt/MODTRAN-5.4.0/Mod5.4.0tag/DATA ${PROCESSING_HOME}/DATA
  
   ciop-log "INFO" "Getting atmospheric profile" 
-  local profile=$( getRas "${date}" "${station}" "${volcano}" "${PROCESSING_HOME}")
+  local profile=$( getRas "${date}" "${station}" "${region}" "${PROCESSING_HOME}")
   res=$?
   [ "${res}" -ne "0" ] && return ${ERR_GET_RAS}
   ciop-log "INFO" "Atmospheric profile downloaded" 
@@ -112,9 +113,9 @@ function main() {
   ciop-log "INFO" "**** STEMP node finished ****"
 }
 
-while IFS=',' read ref identifier date station volcano geom
+while IFS=',' read ref identifier date station region volcano geom
 do
-    main "${ref}" "${identifier}" "${date}" "${station}" "${volcano}" "${geom}"
+    main "${ref}" "${identifier}" "${date}" "${station}" "${region}" "${volcano}" "${geom}"
     res=$?
     [ "${res}" != "0" ] && exit ${res}
 done

@@ -76,7 +76,7 @@ function getData() {
   local enclosure
   local res
 
-  if [[ "${ref:0:4}" == "file" ] || [ "${ref:0:1}" == "/" ]]; then
+  if [ "${ref:0:4}" == "file" ] || [ "${ref:0:1}" == "/" ]; then
     enclosure=${ref}
   else
     enclosure=$( urlResolver "${ref}" )
@@ -108,42 +108,46 @@ function getRas() {
   local day=${date:8:2}
   local hour=${date:11:2}
   
-  ref_date="${year}${month}${day}"
+  ref_date="${year}-${month}-${day}"
   
   if [ ${hour} -le "18" ]; then
     hour="12"
   else
     hour="00"
+    ciop-log "INFO" "[getRas function] Since hour >18, we get the atmospheric profile of the day after at ${hour}"
     # the day shall be incremented by one, to get the closest atm. profile
-    ref_date=$(date -d "${ref_date} +1 day" '+%Y%m%d')
+    ref_date=$(date -d "${ref_date} +1 day" '+%Y-%m-%d')
   fi
   
   local terminate=0
 
-  while [ ${terminate} -eq 0 ]; do
+  while [ ${terminate} -eq 0 ] ; do
     
-    ref_date=$(date -d "${ref_date} -${days} day" '+%Y%m%d')
+    local new_date=$(date -d "${ref_date} -${days} day" '+%Y-%m-%d')
     
-    year=${ref_date:0:4}
-    month=${ref_date:5:2}
-    day=${ref_date:8:2}
+    year=${new_date:0:4}
+    month=${new_date:5:2}
+    day=${new_date:8:2}
     
-    ciop-log "INFO" "[getRas function] Trying to get atmospheric profile ${days} before"
+    if [ ${days} -gt 0 ]; then
+      ciop-log "INFO" "[getRas function] Trying to get atmospheric profile ${days} day(s) before"
+    fi
     
     local sounding_url="http://weather.uwyo.edu/cgi-bin/sounding?region=${region}&TYPE=TEXT%3ALIST&YEAR=${year}&MONTH=${month}&FROM=${day}${hour}&TO=${day}${hour}&STNM=${station}"
 
-    ciop-log "INFO" "[getRas function] sounding_url: ${sounding_url} "
+    ciop-log "INFO" "[getRas function] sounding url: ${sounding_url} "
 
     curl -s -o ${target}/RAW${year}${month}${day}${hour}_${station}.txt "${sounding_url}"
     res=$?
     
-    ciop-log "INFO" "[getRas function] curl return code: ${res}"
+    ciop-log "INFO" "[getRas function] request return code: ${res}"
   
-    if [ ${res} -ne 0 ]; then
+    if [ ${res} -ne 0 ] ; then
       days=$((days+1))
-      if [ days -gt ${MAX_DAYS_BEFORE}] ; then
+      if [ ${days} -gt ${MAX_DAYS_BEFORE} ] ; then
         terminate=1
         return ${res}
+      fi
     else
       terminate=1
       echo ${target}/RAW${year}${month}${day}${hour}_${station}.txt
