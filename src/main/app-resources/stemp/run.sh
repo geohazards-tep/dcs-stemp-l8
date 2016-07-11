@@ -77,7 +77,6 @@ function main() {
   ciop-log "INFO" "STEMP environment ready"
   ciop-log "INFO" "------------------------------------------------------------"
 
-  ciop-publish -m ${PROCESSING_HOME}/*dem* || return $?
   # temporary stopping the process
   exit ${SUCCESS}
 
