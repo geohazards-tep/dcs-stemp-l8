@@ -1,0 +1,13 @@
+region,station id,lon,lat
+~ ~ ~ ~ ~ ~ ~ 
+Region values:
+* naconf (North America)
+* samer (South America)
+* pac (South Pacific)
+* nz (New Zealand)
+* ant (Antartica)
+* np (Arctic)
+* europe (Europe)
+* africa (Africa)
+* seasia (Southest Asia)
+* mideast (Mideast)
