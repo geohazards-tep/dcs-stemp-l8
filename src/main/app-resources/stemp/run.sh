@@ -40,7 +40,7 @@ function main() {
   
   ciop-log "INFO" "Getting Digital Elevation Model" 
   local dem=$( getDem "${geom}" "${PROCESSING_HOME}" )
-  #res=$?
+  res=$?
   [ "${res}" -ne "0" ] && return ${ERR_GET_DEM}
   ciop-log "INFO" "Digital Elevation Model downloaded"
   ciop-log "INFO" "------------------------------------------------------------" 
