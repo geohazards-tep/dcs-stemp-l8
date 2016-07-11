@@ -53,16 +53,16 @@ function main() {
   ciop-log "INFO" "------------------------------------------------------------"
 
   ciop-log "INFO" "Uncompressing product" 
-  mkdir -p ${PROCESSING_HOME}/${identifier}
+  mkdir -p ${PROCESSING_HOME}
   # TODO: manage different compress formats
-  tar xjf ${product} -C ${PROCESSING_HOME}/${identifier}
+  tar xjf ${product} -C ${PROCESSING_HOME}
   res=$?
   [ "${res}" -ne "0" ] && return ${$ERR_UNCOMP}
   ciop-log "INFO" "Product uncompressed"
   ciop-log "INFO" "------------------------------------------------------------"
  
   ciop-log "INFO" "Preparing file_input.cfg" 
-  basename ${identifier} >> ${PROCESSING_HOME}/file_input.cfg
+  echo "$( basename ${identifier})_B10.TIF" >> ${PROCESSING_HOME}/file_input.cfg
   basename ${profile} >> ${PROCESSING_HOME}/file_input.cfg
   basename ${dem} >> ${PROCESSING_HOME}/file_input.cfg
   basename ${volcano} >> ${PROCESSING_HOME}/file_input.cfg
@@ -77,11 +77,12 @@ function main() {
   ciop-log "INFO" "STEMP environment ready"
   ciop-log "INFO" "------------------------------------------------------------"
 
+  ciop-publish -m ${PROCESSING_HOME}/*dem* || return $?
   # temporary stopping the process
   exit ${SUCCESS}
 
-  ciop-log "INFO" "Starting STEMP core" 
-  /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav
+  ciop-log "INFO" "Starting STEMP core"
+  /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav -IDL_DEVICE Z  
   
   ciop-log "INFO" "STEMP core finished"
   ciop-log "INFO" "------------------------------------------------------------"
