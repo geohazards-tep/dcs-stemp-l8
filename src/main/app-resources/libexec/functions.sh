@@ -109,14 +109,18 @@ function getRas() {
   local hour=${date:11:2}
   
   ref_date="${year}-${month}-${day}"
-  
-  if [ ${hour} -le "18" ]; then
-    hour="12"
-  else
+ 
+  # Implementing rule defined at https://support.terradue.com/issues/4434
+  if [ ${hour} -le 5 ]; then
     hour="00"
-    ciop-log "INFO" "[getRas function] Since hour >18, we get the atmospheric profile of the day after at ${hour}"
-    # the day shall be incremented by one, to get the closest atm. profile
-    ref_date=$(date -d "${ref_date} +1 day" '+%Y-%m-%d')
+  else
+    if [ ${hour} -le 17 ]; then
+      hour="12"
+    else
+      hour="00"
+      ref_date=$(date -d "${ref_date} +1 day" '+%Y-%m-%d')
+      ciop-log "INFO" "[getRas function] Since hour is greater than 17:59, we get the atmospheric profile of the day after at ${hour}"
+    fi
   fi
   
   local terminate=0
