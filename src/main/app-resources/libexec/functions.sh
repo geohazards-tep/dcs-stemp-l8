@@ -16,8 +16,8 @@ ERR_UNCOMP=254
 ERR_PUBLISH=255
 
 # add a trap to exit gracefully
-function cleanExit ()
-{
+function cleanExit () {
+  
   local retval=$?
   local msg=""
   case "$retval" in
@@ -76,21 +76,21 @@ function getData() {
   local enclosure
   local res
 
-  [ "${ref:0:4}" == "file" ] || [ "${ref:0:1}" == "/" ] && enclosure=${ref}
+  if [[ "${ref:0:4}" == "file" ] || [ "${ref:0:1}" == "/" ]]; then
+    enclosure=${ref}
+  else
+    enclosure=$( urlResolver "${ref}" )
+    res=$?
+    [ "${res}" -ne "0" ] && ${ERR_GETDATA}
+  fi
 
-  [ -z "$enclosure" ] && enclosure=$( url_resolver "${ref}" )
-  res=$?
-  enclosure=$( echo ${enclosure} | tail -1 )
-  [ $res -eq 0 ] && [ -z "${enclosure}" ] && return ${ERR_GETDATA}
-  [ $res -ne 0 ] && enclosure=${ref}
-
-  ciop-log "INFO" "[getData function] Data url: ${enclosure}"
+  ciop-log "INFO" "[getData function] Data enclosure url: ${enclosure}"
   
   local_file="$( echo ${enclosure} | ciop-copy -f -U -O ${target} - 2> /dev/null )"
   res=$?
-  [ ${res} -ne 0 ] && return ${res}
+  [ "${res}" -ne "0" ] && return ${ERR_GETDATA}
+  
   echo ${local_file}
-
 }
 
 function getRas() {
@@ -99,45 +99,79 @@ function getRas() {
   local station=$2
   local region=$3
   local target=$4
+  local days=0
+  local MAX_DAYS_BEFORE=7
 
   # UTC format for date
   local year=${date:0:4}
   local month=${date:5:2}
   local day=${date:8:2}
   local hour=${date:11:2}
-
-  if [ ${hour} -le "17" ]; then
-    hour="00"
-  else
+  
+  ref_date="${year}${month}${day}"
+  
+  if [ ${hour} -le "18" ]; then
     hour="12"
+  else
+    hour="00"
+    # the day shall be incremented by one, to get the closest atm. profile
+    ref_date=$(date -d "${ref_date} +1 day" '+%Y%m%d')
   fi
-
-  local sounding_url="http://weather.uwyo.edu/cgi-bin/sounding?region=${region}&TYPE=TEXT%3ALIST&YEAR=${year}&MONTH=${month}&FROM=${day}${hour}&TO=${day}${hour}&STNM=${station}"
-
-  ciop-log "INFO" "[getRas function] sounding_url: ${sounding_url} "
-
-  curl -s -o ${target}/RAW${year}${month}${day}${hour}_${station}.txt "${sounding_url}"
-  res=$?
   
-  ciop-log "INFO" "[getRas function] curl return code: ${res}"
+  local terminate=0
+
+  while [ ${terminate} -eq 0 ]; do
+    
+    ref_date=$(date -d "${ref_date} -${days} day" '+%Y%m%d')
+    
+    year=${ref_date:0:4}
+    month=${ref_date:5:2}
+    day=${ref_date:8:2}
+    
+    ciop-log "INFO" "[getRas function] Trying to get atmospheric profile ${days} before"
+    
+    local sounding_url="http://weather.uwyo.edu/cgi-bin/sounding?region=${region}&TYPE=TEXT%3ALIST&YEAR=${year}&MONTH=${month}&FROM=${day}${hour}&TO=${day}${hour}&STNM=${station}"
+
+    ciop-log "INFO" "[getRas function] sounding_url: ${sounding_url} "
+
+    curl -s -o ${target}/RAW${year}${month}${day}${hour}_${station}.txt "${sounding_url}"
+    res=$?
+    
+    ciop-log "INFO" "[getRas function] curl return code: ${res}"
   
-  [ ${res} -ne 0 ] && return ${res}
-  
-  echo ${target}/RAW${year}${month}${day}${hour}_${station}.txt
+    if [ ${res} -ne 0 ]; then
+      days=$((days+1))
+      if [ days -gt ${MAX_DAYS_BEFORE}] ; then
+        terminate=1
+        return ${res}
+    else
+      terminate=1
+      echo ${target}/RAW${year}${month}${day}${hour}_${station}.txt
+    fi
+  done
 }
 
-function url_resolver() {
+function urlResolver() {
 
   local url=""
   local reference="$1"
   
-  read identifier path < <( opensearch-client -m EOP  "${reference}" identifier,wrsLongitudeGrid | tr "," " " )
-  [ -z "${path}" ] && path="$( echo ${identifier} | cut -c 4-6)"
-  row="$( echo ${identifier} | cut -c 7-9)"
+  # Managing the special case for Landsat8, where we get data directly from
+  # Google
+  landsat8=$( echo "${reference}" | grep "landsat8" )
+  
+  if [ -n "${landsat8}" ]; then
+    read identifier path < <( opensearch-client -m EOP  "${reference}" identifier,wrsLongitudeGrid | tr "," " " )
+    [ -z "${path}" ] && path="$( echo ${identifier} | cut -c 4-6)"
+    row="$( echo ${identifier} | cut -c 7-9)"
 
-  url="http://storage.googleapis.com/earthengine-public/landsat/L8/${path}/${row}/${identifier}.tar.bz"
+    url="http://storage.googleapis.com/earthengine-public/landsat/L8/${path}/${row}/${identifier}.tar.bz"
+    [ -z "$( curl -s --head "${url}" | head -n 1 | grep "HTTP/1.[01] [23].." )" ] && return 1
 
-  [ -z "$( curl -s --head "${url}" | head -n 1 | grep "HTTP/1.[01] [23].." )" ] && return 1
-
-  echo "${url}"
+    echo "${url}"
+  else
+    url=$( opensearch-client "${reference}" enclosure )
+    res=$?
+    [ "${res}" -ne "0" ] && return ${res}
+  fi
 }
