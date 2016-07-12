@@ -63,7 +63,7 @@ function main() {
       tar xzf ${product} -C ${PROCESSING_HOME}
     ;;
     
-    bz2)
+    bz2 | bz)
       tar xjf ${product} -C ${PROCESSING_HOME}
     ;;
     *)
