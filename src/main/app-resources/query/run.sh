@@ -36,7 +36,7 @@ function main() {
   [ -z ${startdate} ] && exit $ERR_PARAM
   [ -z ${enddate} ] && exit $ERR_PARAM
  
-  IFS=',' read volcano v_lon v_lat station < <( cat ${DB_PATH}/volcanoes | grep ${volcano,,} )
+  IFS=',' read volcano v_lon v_lat station region < <( cat ${DB_PATH}/volcanoes | grep ${volcano,,} )
   [ -z ${volcano} ] && exit $ERR_VOLCANO_NOT_FOUND
 
   ciop-log "INFO" "Volcano name: ${volcano}"
@@ -49,7 +49,7 @@ function main() {
     [ -z ${station} ] && exit $ERR_STATION_NOT_FOUND
   fi
 
-  ciop-log "INFO" "Nearest atmosferic station: ${station}"
+  ciop-log "INFO" "Nearest atmosferic station: ${station},${region}"
   ciop-log "INFO" "Geometry in WKT: ${geom}"
 
   ciop-log "INFO" "Opensearch query: opensearch-client -p \"start=${startdate}\" -p \"stop=${enddate}\" \"https://data2.terradue.com/eop/${mission,,}/dataset/search?geom=${geom}\""
@@ -62,8 +62,8 @@ function main() {
     self,identifier,enddate | tr "," " " | while read self identifier enddate
   do
 
-    ciop-log "INFO" "Publishing to the stemp node: ${self},${identifier},${enddate},${station},${volcano},${geom}"
-    echo "${self},${identifier},${enddate},${station},${volcano},${geom}" | ciop-publish -s
+    ciop-log "INFO" "Publishing to the stemp node: ${self},${identifier},${enddate},${station},${region},${volcano},${geom}"
+    echo "${self},${identifier},${enddate},${station},${region},${volcano},${geom}" | ciop-publish -s
 
   done
 
