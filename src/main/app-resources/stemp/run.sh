@@ -52,9 +52,25 @@ function main() {
   ciop-log "INFO" "------------------------------------------------------------"
 
   ciop-log "INFO" "Uncompressing product" 
-  mkdir -p ${PROCESSING_HOME}/${identifier}
-  # TODO: manage different compress formats
-  tar xjf ${product} -C ${PROCESSING_HOME}/${identifier}
+  
+  case ${product##*.} in
+    zip)
+      unzip -qq -o ${product} -d ${PROCESSING_HOME}
+    ;;
+    
+    gz)
+      tar xzf ${product} -C ${PROCESSING_HOME}
+    ;;
+    
+    bz2)
+      tar xjf ${product} -C ${PROCESSING_HOME}
+    ;;
+    *)
+      ciop-log "ERROR" "Unsupported "${product##*.}" format"
+      return ${$ERR_UNCOMP}
+    ;;
+  esac
+   
   res=$?
   [ "${res}" -ne "0" ] && return ${$ERR_UNCOMP}
   ciop-log "INFO" "Product uncompressed"
