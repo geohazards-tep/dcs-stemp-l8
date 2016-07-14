@@ -16,6 +16,7 @@ function main() {
   local region=$5
   local volcano=$6
   local geom=$7
+  local mission="$(ciop-getparam mission)"
 
   ciop-log "INFO" "**** STEMP node ****"
   ciop-log "INFO" "------------------------------------------------------------"
@@ -76,7 +77,26 @@ function main() {
   [ "${res}" -ne "0" ] && return ${$ERR_UNCOMP}
   ciop-log "INFO" "Product uncompressed"
   ciop-log "INFO" "------------------------------------------------------------"
- 
+  
+  if [ "${mission,,}" -eq "landsat8" ]; then
+    ciop-log "INFO" "Checking Landsat 8 UTM Zone"
+    ciop-log "INFO" "------------------------------------------------------------"  
+    
+    CORNER_LL_LAT_PRODUCT=$( sed -n 's#^.*CORNER_LL_LAT_PRODUCT\s=\s\(.*\)\..*$#\1#p' ${identifier}_MTL.txt )
+    CORNER_LR_LAT_PRODUCT=$( sed -n 's#^.*CORNER_LR_LAT_PRODUCT\s=\s\(.*\)\..*$#\1#p' ${identifier}_MTL.txt )
+    
+    # If the product is located in southern emisphere
+    if [ ${CORNER_LL_LAT_PRODUCT} -le 0 ] || [ ${CORNER_LR_LAT_PRODUCT} -le 0 ]; then
+      ciop-log "INFO" "The Landsat 8 is located in the southern emisphere"
+      
+      UTM_ZONE=$( sed -n 's#^.*UTM_ZONE\s=\s\(.*\)$#\1#p' ${identifier}_MTL.txt )
+      
+      ciop-log "INFO" "Setting the proper UTM Zone for the B10 band"
+      gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs" ${identifier}_B10.TIF ${identifier}_B10_S.TIF
+      mv ${identifier}_B10_S.TIF ${identifier}_B10.TIF 
+    fi
+  fi
+  
   ciop-log "INFO" "Preparing file_input.cfg" 
   echo "$( basename ${identifier})_B10.TIF" >> ${PROCESSING_HOME}/file_input.cfg
   basename ${profile} >> ${PROCESSING_HOME}/file_input.cfg
