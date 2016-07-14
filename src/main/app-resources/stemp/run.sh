@@ -35,21 +35,21 @@ function main() {
   ciop-log "INFO" "Getting atmospheric profile" 
   local profile=$( getRas "${date}" "${station}" "${region}" "${PROCESSING_HOME}")
   res=$?
-  [ "${res}" -ne "0" ] && return ${ERR_GET_RAS}
+  [ ${res} -ne 0 ] && return ${ERR_GET_RAS}
   ciop-log "INFO" "Atmospheric profile downloaded" 
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Getting Digital Elevation Model" 
   local dem=$( getDem "${geom}" "${PROCESSING_HOME}" )
   res=$?
-  [ "${res}" -ne "0" ] && return ${ERR_GET_DEM}
+  [ ${res} -ne 0 ] && return ${ERR_GET_DEM}
   ciop-log "INFO" "Digital Elevation Model downloaded"
   ciop-log "INFO" "------------------------------------------------------------" 
   
   ciop-log "INFO" "Getting input product" 
   local product=$( getData "${ref}" "${PROCESSING_HOME}" )
   res=$?
-  [ "${res}" -ne "0" ] && return ${ERR_GET_DATA}
+  [ ${res} -ne 0 ] && return ${ERR_GET_DATA}
   ciop-log "INFO" "Input product downloaded"
   ciop-log "INFO" "------------------------------------------------------------"
 
@@ -74,11 +74,11 @@ function main() {
   esac
    
   res=$?
-  [ "${res}" -ne "0" ] && return ${$ERR_UNCOMP}
+  [ ${res} -ne 0 ] && return ${$ERR_UNCOMP}
   ciop-log "INFO" "Product uncompressed"
   ciop-log "INFO" "------------------------------------------------------------"
   
-  if [ "${mission,,}" -eq "landsat8" ]; then
+  if [ "${mission,,}" = "landsat8" ]; then
     ciop-log "INFO" "Checking Landsat 8 UTM Zone"
     ciop-log "INFO" "------------------------------------------------------------"  
     
@@ -138,7 +138,7 @@ function main() {
   ciop-log "INFO" "Staging-out results ..."
   ciop-publish -m ${PROCESSING_HOME}/*TEMP.tif || return $?
   ciop-publish -m ${PROCESSING_HOME}/*TEMP.png* || return $?
-  [ "${res}" -ne "0" ] && return ${ERR_PUBLISH}
+  [ ${res} -ne 0 ] && return ${ERR_PUBLISH}
   
   ciop-log "INFO" "Results staged out"
   ciop-log "INFO" "------------------------------------------------------------"
@@ -153,7 +153,7 @@ while IFS=',' read ref identifier date station region volcano geom
 do
     main "${ref}" "${identifier}" "${date}" "${station}" "${region}" "${volcano}" "${geom}"
     res=$?
-    [ "${res}" != "0" ] && exit ${res}
+    [ ${res} -ne 0 ] && exit ${res}
 done
 
 exit ${SUCCESS}
