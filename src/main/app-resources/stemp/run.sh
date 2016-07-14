@@ -80,8 +80,7 @@ function main() {
   ciop-log "INFO" "------------------------------------------------------------"
   
   if [ "${mission,,}" = "landsat8" ]; then
-    ciop-log "INFO" "Checking Landsat 8 UTM Zone"
-    ciop-log "INFO" "------------------------------------------------------------"  
+    ciop-log "INFO" "Checking Landsat 8 UTM Zone"  
     
     CORNER_LL_LAT_PRODUCT=$( sed -n 's#^.*CORNER_LL_LAT_PRODUCT\s=\s\(.*\)\..*$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt )
     CORNER_LR_LAT_PRODUCT=$( sed -n 's#^.*CORNER_LR_LAT_PRODUCT\s=\s\(.*\)\..*$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt )
@@ -96,6 +95,8 @@ function main() {
       gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs" ${PROCESSING_HOME}/${identifier}_B10.TIF ${PROCESSING_HOME}/${identifier}_B10_S.TIF 1>&2
       mv ${PROCESSING_HOME}/${identifier}_B10_S.TIF ${PROCESSING_HOME}/${identifier}_B10.TIF 
     fi
+    
+    ciop-log "INFO" "------------------------------------------------------------"
   fi
   
   ciop-log "INFO" "Preparing file_input.cfg" 
