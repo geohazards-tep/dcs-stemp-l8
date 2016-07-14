@@ -11,15 +11,16 @@ function main() {
 
   local ref=$1
   local identifier=$2
-  local date=$3
-  local station=$4
-  local region=$5
-  local volcano=$6
-  local geom=$7
-  local mission="$(ciop-getparam mission)"
+  local mission=$3
+  local date=$4
+  local station=$5
+  local region=$6
+  local volcano=$7
+  local geom=$8
 
   ciop-log "INFO" "**** STEMP node ****"
   ciop-log "INFO" "------------------------------------------------------------"
+  ciop-log "INFO" "Mission: ${mission}" 
   ciop-log "INFO" "Input product reference: ${ref}" 
   ciop-log "INFO" "Date and time: ${date}" 
   ciop-log "INFO" "Reference atmospheric station: ${station}, ${region}" 
