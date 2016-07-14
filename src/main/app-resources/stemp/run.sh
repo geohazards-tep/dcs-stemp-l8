@@ -151,9 +151,9 @@ function main() {
   ciop-log "INFO" "**** STEMP node finished ****"
 }
 
-while IFS=',' read ref identifier date station region volcano geom
+while IFS=',' read ref identifier mission date station region volcano geom
 do
-    main "${ref}" "${identifier}" "${date}" "${station}" "${region}" "${volcano}" "${geom}"
+    main "${ref}" "${identifier}" "${mission}" "${date}" "${station}" "${region}" "${volcano}" "${geom}"
     res=$?
     [ ${res} -ne 0 ] && exit ${res}
 done
