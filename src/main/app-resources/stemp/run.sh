@@ -88,12 +88,12 @@ function main() {
     
     # If the product is located in southern emisphere
     if [ ${CORNER_LL_LAT_PRODUCT} -le 0 ] || [ ${CORNER_LR_LAT_PRODUCT} -le 0 ]; then
-      ciop-log "INFO" "The Landsat 8 is located in the southern emisphere"
+      ciop-log "INFO" "The product ${identifier} is located in the southern emisphere"
       
       UTM_ZONE=$( sed -n 's#^.*UTM_ZONE\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt )
       
-      ciop-log "INFO" "Setting the proper UTM Zone for the B10 band"
-      gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs" ${PROCESSING_HOME}/${identifier}_B10.TIF ${PROCESSING_HOME}/${identifier}_B10_S.TIF
+      ciop-log "INFO" "Setting the proper UTM Zone ${UTM_ZONE} for the B10 TIF"
+      gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs" ${PROCESSING_HOME}/${identifier}_B10.TIF ${PROCESSING_HOME}/${identifier}_B10_S.TIF 1>&2
       mv ${PROCESSING_HOME}/${identifier}_B10_S.TIF ${PROCESSING_HOME}/${identifier}_B10.TIF 
     fi
   fi
