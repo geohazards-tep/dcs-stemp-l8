@@ -85,9 +85,9 @@ function main() {
     CORNER_LL_LAT_PRODUCT=$( sed -n 's#^.*CORNER_LL_LAT_PRODUCT\s=\s\(.*\)\..*$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt )
     CORNER_LR_LAT_PRODUCT=$( sed -n 's#^.*CORNER_LR_LAT_PRODUCT\s=\s\(.*\)\..*$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt )
     
-    # If the product is located in southern emisphere
+    # If the product is located in southern hemisphere
     if [ ${CORNER_LL_LAT_PRODUCT} -le 0 ] || [ ${CORNER_LR_LAT_PRODUCT} -le 0 ]; then
-      ciop-log "INFO" "The product ${identifier} is located in the southern emisphere"
+      ciop-log "INFO" "The product ${identifier} is located in the southern hemisphere"
       
       UTM_ZONE=$( sed -n 's#^.*UTM_ZONE\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt )
       
