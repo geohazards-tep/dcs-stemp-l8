@@ -11,6 +11,25 @@
             <option>Etna</option>
             <option>Stromboli</option>
             <option>Vesuvio Campi Flegrei</option>
+            <option>Puyehue-Cordon Caulle</option>
+            <option>Arenal</option>
+            <option>Poas</option>
+            <option>Turrialba</option>
+            <option>La Cumbre / Fernandina</option>
+            <option>Sangai</option>
+            <option>Sierra Negra</option>
+            <option>Piton de la Fournaise</option>
+            <option>Santiaguito</option>
+            <option>Dukono</option>
+            <option>Ibu</option>
+            <option>Merapi</option>
+            <option>Colima</option>
+            <option>Cotopaxi</option>
+            <option>Tungurahua</option>
+            <option>Reventador</option>
+            <option>Cotacachi</option>
+            <option>Sinabung</option>
+            <option>Cachimbiro</option>
             <default>Etna</default>
           </options>
         </parameter>
