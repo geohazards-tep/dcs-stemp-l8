@@ -46,7 +46,7 @@ function main() {
   local geom="POINT(${v_lon} ${v_lat})"
 
   if [ -z ${station} ]; then
-    station=$(find_station)
+    station=$( find_station ${v_lon} ${v_lat} )
     [ -z ${station} ] && exit $ERR_STATION_NOT_FOUND
   fi
 
