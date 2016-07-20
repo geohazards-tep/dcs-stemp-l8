@@ -45,7 +45,7 @@ function main() {
   
   local geom="POINT(${v_lon} ${v_lat})"
 
-  if [ -z ${station} ]; then
+  if [ -z "${station}" ]; then
     station_found=$( find_station ${v_lon} ${v_lat} )
     [ -z ${station_found} ] && exit $ERR_STATION_NOT_FOUND
     region=$( echo ${station_found} | cut -d ' ' -f1 )
