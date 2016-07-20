@@ -79,12 +79,12 @@ function convertDemToGeoTIFF() {
   ciop-log "INFO" "[convertDemToGeoTIFF function] GeoTIFF conversion: ${utm_zone}"
   ciop-log "INFO" "[convertDemToGeoTIFF function] Preparing ENVI .hdr Labelled Raster"
   
-  X_FIRST = $( sed -n 's#^X_FIRST\s*\(.*\)$#\1#p' ${rsc} )
-  Y_FIRST = $( sed -n 's#^Y_FIRST\s*\(.*\)$#\1#p' ${rsc} )
-  X_STEP  = $( sed -n 's#^X_STEP\s*\(.*\)$#\1#p' ${rsc} ) 
+  X_FIRST=$( sed -n 's#^X_FIRST\s*\(.*\)$#\1#p' ${rsc} )
+  Y_FIRST=$( sed -n 's#^Y_FIRST\s*\(.*\)$#\1#p' ${rsc} )
+  X_STEP=$( sed -n 's#^X_STEP\s*\(.*\)$#\1#p' ${rsc} ) 
   
-  X_STEP = $( echo "define abs(x) {if (x<0) {return -x}; return x;}; abs(${X_STEP})" | bc )
-  X_STEP = $( printf '%.15f\n' ${X_STEP} )
+  X_STEP=$( echo "define abs(x) {if (x<0) {return -x}; return x;}; abs(${X_STEP})" | bc )
+  X_STEP=$( printf '%.15f\n' ${X_STEP} )
   
 cat << EOF > ${target}/${identifier}.dem.hdr
 ENVI
