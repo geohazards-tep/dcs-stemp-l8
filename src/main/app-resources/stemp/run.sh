@@ -66,8 +66,8 @@ function main() {
   
   ciop-log "INFO" "Croppig Digital Elevation Model"
   
-  # Extent in degrees
-  local extent=0.2
+  # Extent in degree
+  local extent=0.3
   local cropped_dem=$( cropDem "${dem_geotiff}" "${PROCESSING_HOME}" "${v_lon}" "${v_lat}" "${extent}" )
   ciop-log "INFO" "------------------------------------------------------------"
   

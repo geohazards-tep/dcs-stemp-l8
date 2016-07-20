@@ -2,7 +2,8 @@
 
 source /application/libexec/functions.sh
 
-DB_PATH=/application/query/db
+export DB_PATH=${_CIOP_APPLICATION_PATH}/query/db
+export PATH=${_CIOP_APPLICATION_PATH}/query/bin:$PATH
 
 function find_station() {
   
