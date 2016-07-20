@@ -53,25 +53,22 @@ function main() {
   
   ciop-log "INFO" "Converting Digital Elevation Model to GeoTIFF"
   
-  local dem_filename=$( basename ${dem} )
-  local dem_identifier=${dem_filename%.*}
-  
   mv ${dem}.rsc ${PROCESSING_HOME}/dem.rsc
-  mv ${dem} ${PROCESSING_HOME}/dem.dem
+  mv ${dem} ${PROCESSING_HOME}/dem
   
   dem_identifier="dem"
   
   ls -l ${PROCESSING_HOME}
   ls -l ${dem}
   
-  local dem_geotiff=$( convertDemToGeoTIFF "${PROCESSING_HOME}/dem.rsc" "${PROCESSING_HOME}/dem.dem" "${dem_identifier}" "${PROCESSING_HOME}" )
+  local dem_geotiff=$( convertDemToGeoTIFF "${PROCESSING_HOME}/dem.rsc" "${PROCESSING_HOME}/dem" "${PROCESSING_HOME}" )
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Croppig Digital Elevation Model"
   
   # Extent in degrees
   local extent=0.2
-  local cropped_dem = $( cropDem "${dem_geotiff}" "${dem_identifier}" "${PROCESSING_HOME}" "${v_lon}" "${v_lat}" "${extent}" )
+  local cropped_dem=$( cropDem "${dem_geotiff}" "${PROCESSING_HOME}" "${v_lon}" "${v_lat}" "${extent}" )
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Getting input product" 
@@ -107,6 +104,7 @@ function main() {
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Getting the emissivity file"
+  ciop-log "INFO" "${EMISSIVITY_AUX_PATH}/${volcano/ /_}.tif"
   cp ${EMISSIVITY_AUX_PATH}/${volcano/ /_}.tif ${PROCESSING_HOME}
   
   ciop-log "INFO" "------------------------------------------------------------"
@@ -128,7 +126,7 @@ function main() {
   if [ ${v_lat} -le 0 ]; then
     
     ciop-log "INFO" "Converting DEM to UTM Zone S"
-    gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +datum=WGS84" ${cropped_dem} ${PROCESSING_HOME}/${dem_identifier}_UTM.TIF 1>&2
+    gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +datum=WGS84" ${cropped_dem} ${PROCESSING_HOME}/dem_UTM.TIF 1>&2
     
     if [ "${mission,,}" = "landsat8" ]; then
       ciop-log "INFO" "Setting the proper UTM Zone ${UTM_ZONE} for the B10 TIF"
@@ -146,12 +144,12 @@ function main() {
     
   else
     ciop-log "INFO" "Converting DEM to UTM Zone N"
-    gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +datum=WGS84" ${cropped_dem} ${PROCESSING_HOME}/${dem_identifier%*.}_UTM.TIF 1>&2
+    gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +datum=WGS84" ${cropped_dem} ${PROCESSING_HOME}/dem_UTM.TIF 1>&2
     ciop-log "INFO" "------------------------------------------------------------"
   fi
   
   ciop-log "INFO" "Setting DEM resolution to 90m" 
-  gdalwarp -tr 90 -90 ${PROCESSING_HOME}/${dem_identifier}_UTM.TIF ${PROCESSING_HOME}/${dem_identifier%*.}_UTM_90.TIF 1>&2
+  gdalwarp -tr 90 -90 ${PROCESSING_HOME}/dem_UTM.TIF ${PROCESSING_HOME}/dem_UTM_90.TIF 1>&2
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Preparing file_input.cfg" 
@@ -165,7 +163,7 @@ function main() {
   esac
   
   basename ${profile} >> ${PROCESSING_HOME}/file_input.cfg
-  echo "${dem_identifier}_UTM_90.TIF" >> ${PROCESSING_HOME}/file_input.cfg
+  echo "dem_UTM_90.TIF" >> ${PROCESSING_HOME}/file_input.cfg
   echo "${volcano/ /_}.tif" >> ${PROCESSING_HOME}/file_input.cfg
 
   ciop-log "INFO" "file_input.cfg content:"
@@ -180,7 +178,7 @@ function main() {
   
   ciop-publish -m ${PROCESSING_HOME}/*_B10.TIF || return $?
   ciop-publish -m ${PROCESSING_HOME}/*txt || return $?
-  ciop-publish -m ${PROCESSING_HOME}/*_UTM_90.TIF || return $?
+  ciop-publish -m ${PROCESSING_HOME}/dem_UTM_90.TIF || return $?
   ciop-publish -m ${PROCESSING_HOME}/*${volcano/ /_}.tif || return $?
 
   # temporary stopping the process

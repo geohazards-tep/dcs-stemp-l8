@@ -68,13 +68,11 @@ function getDem() {
 
 }
 
-
 function convertDemToGeoTIFF() {
 
   local rsc=$1
   local dem=$2
-  local identifier=$3
-  local target=$4
+  local target=$3
 
   ciop-log "INFO" "[convertDemToGeoTIFF function] GeoTIFF conversion: ${utm_zone}"
   ciop-log "INFO" "[convertDemToGeoTIFF function] Preparing ENVI .hdr Labelled Raster"
@@ -86,7 +84,7 @@ function convertDemToGeoTIFF() {
   X_STEP=$( echo "define abs(x) {if (x<0) {return -x}; return x;}; abs(${X_STEP})" | bc )
   X_STEP=$( printf '%.15f\n' ${X_STEP} )
   
-cat << EOF > ${target}/${identifier}.dem.hdr
+cat << EOF > ${target}/dem.hdr
 ENVI
 description = {
 dem}
@@ -104,27 +102,22 @@ dem}
 EOF
 
   ciop-log "INFO" "[convertDemToGeoTIFF function] .hdr Raster:"
-  cat ${target}/${identifier}.dem.hdr 1>&2
+  cat ${target}/dem.hdr 1>&2
   
-  ciop-log "INFO" "gdal_translate ${dem} ${target}/${identifier}.dem.TIF"
+  ciop-log "INFO" "gdal_translate ${dem} ${target}/dem.TIF"
   
-  gdal_translate ${dem} ${target}/${identifier}.dem.TIF 1>&2
+  gdal_translate ${dem} ${target}/dem.TIF 1>&2
   
-  cp ${dem} /tmp/
-  cp ${target}/${identifier}.dem.hdr /tmp/
-  gdal_translate /tmp/dem.dem /tmp/dem.TIF 1>&2
-  
-  echo ${target}/${identifier}.dem.TIF
+  echo ${target}/dem.TIF
 }
 
 function cropDem() {
   
   local dem=$1
-  local identifier=$2
-  local target=$3
-  local lon=$4
-  local lat=$5
-  local extent=$6
+  local target=$2
+  local lon=$3
+  local lat=$4
+  local extent=$5
   
   ciop-log "INFO" "[cropDem function] lon: ${lon}"
   ciop-log "INFO" "[cropDem function] lat: ${lat}"
@@ -140,9 +133,9 @@ function cropDem() {
   ciop-log "INFO" "[cropDem function] east: ${east}"
   ciop-log "INFO" "[cropDem function] south: ${south}"
 
-  gdal_translate -of GTiff -projwin ${west} ${north} ${east} ${south} ${dem} ${target}/${identifier}_crop.TIF 1>&2
+  gdal_translate -of GTiff -projwin ${west} ${north} ${east} ${south} ${dem} ${target}/dem_crop.TIF 1>&2
   
-  echo ${target}/${identifier}_crop.TIF
+  echo ${target}/dem_crop.TIF
 }
 
 
