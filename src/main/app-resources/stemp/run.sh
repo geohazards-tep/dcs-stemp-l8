@@ -169,13 +169,11 @@ function main() {
   ciop-log "INFO" "STEMP environment ready"
   ciop-log "INFO" "------------------------------------------------------------"
   
+  # temporary publish
   ciop-publish -m ${PROCESSING_HOME}/*_B10.TIF || return $?
   ciop-publish -m ${PROCESSING_HOME}/*txt || return $?
   ciop-publish -m ${PROCESSING_HOME}/dem* || return $?
   ciop-publish -m ${PROCESSING_HOME}/*${volcano/ /_}.tif || return $?
-
-  # temporary stopping the process
-  exit ${SUCCESS}
 
   ciop-log "INFO" "Starting STEMP core"
   /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav -IDL_DEVICE Z  
