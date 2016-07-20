@@ -79,8 +79,10 @@ function convertDemToGeoTIFF() {
   
   X_FIRST=$( sed -n 's#^X_FIRST\s*\(.*\)$#\1#p' ${rsc} )
   Y_FIRST=$( sed -n 's#^Y_FIRST\s*\(.*\)$#\1#p' ${rsc} )
-  X_STEP=$( sed -n 's#^X_STEP\s*\(.*\)$#\1#p' ${rsc} ) 
-  
+  X_STEP=$( sed -n 's#^X_STEP\s*\(.*\)$#\1#p' ${rsc} )
+  WIDTH=$( sed -n 's#^WIDTH\s*\(.*\)$#\1#p' ${rsc} )
+  FILE_LENGTH=$( sed -n 's#^FILE_LENGTH\s*\(.*\)$#\1#p' ${rsc} )
+
   X_STEP=$( echo "define abs(x) {if (x<0) {return -x}; return x;}; abs(${X_STEP})" | bc )
   X_STEP=$( printf '%.15f\n' ${X_STEP} )
   
@@ -88,8 +90,8 @@ cat << EOF > ${target}/dem.hdr
 ENVI
 description = {
 dem}
-samples = 12000
-lines   = 6000
+samples = ${WIDTH}
+lines   = ${FILE_LENGTH}
 bands   = 1
 header offset = 0
 file type = ENVI Standard

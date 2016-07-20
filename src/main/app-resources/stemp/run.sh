@@ -98,9 +98,10 @@ function main() {
   ciop-log "INFO" "Product uncompressed"
   ciop-log "INFO" "------------------------------------------------------------"
   
-  ciop-log "INFO" "Getting the emissivity file"
+  ciop-log "INFO" "Getting the emissivity file and spectral response functions"
   ciop-log "INFO" "${EMISSIVITY_AUX_PATH}/${volcano/ /_}.tif"
   cp ${EMISSIVITY_AUX_PATH}/${volcano/ /_}.tif ${PROCESSING_HOME}
+  cp ${EMISSIVITY_AUX_PATH}/*.txt ${PROCESSING_HOME}
   
   ciop-log "INFO" "------------------------------------------------------------"
   
