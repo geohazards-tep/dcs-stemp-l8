@@ -52,18 +52,20 @@ function main() {
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Converting Digital Elevation Model to GeoTIFF"
-  local dem_identifier=$( basename ${dem} )
+  
+  local dem_filename=$( basename ${dem} )
+  local dem_identifier=${dem_filename%*.}
   ls -l ${PROCESSING_HOME}
   ls -l ${dem}
   
-  local dem_geotiff=$( convertDemToGeoTIFF "${dem}.rsc" "${dem}" "${dem_identifier%*.}" "${PROCESSING_HOME}" )
+  local dem_geotiff=$( convertDemToGeoTIFF "${dem}.rsc" "${dem}" "${dem_identifier}" "${PROCESSING_HOME}" )
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Croppig Digital Elevation Model"
   
   # Extent in degrees
   local extent=0.2
-  local cropped_dem = $( cropDem "${dem_geotiff}" "${dem_identifier%*.}" "${PROCESSING_HOME}" "${v_lon}" "${v_lat}" "${extent}" )
+  local cropped_dem = $( cropDem "${dem_geotiff}" "${dem_identifier}" "${PROCESSING_HOME}" "${v_lon}" "${v_lat}" "${extent}" )
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Getting input product" 
@@ -120,7 +122,7 @@ function main() {
   if [ ${v_lat} -le 0 ]; then
     
     ciop-log "INFO" "Converting DEM to UTM Zone S"
-    gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +datum=WGS84" ${cropped_dem} ${PROCESSING_HOME}/${dem_identifier%*.}_UTM.TIF 1>&2
+    gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +datum=WGS84" ${cropped_dem} ${PROCESSING_HOME}/${dem_identifier}_UTM.TIF 1>&2
     
     if [ "${mission,,}" = "landsat8" ]; then
       ciop-log "INFO" "Setting the proper UTM Zone ${UTM_ZONE} for the B10 TIF"
@@ -143,7 +145,7 @@ function main() {
   fi
   
   ciop-log "INFO" "Setting DEM resolution to 90m" 
-  gdalwarp -tr 90 -90 ${PROCESSING_HOME}/${dem_identifier%*.}_UTM.TIF ${PROCESSING_HOME}/${dem_identifier%*.}_UTM_90.TIF 1>&2
+  gdalwarp -tr 90 -90 ${PROCESSING_HOME}/${dem_identifier}_UTM.TIF ${PROCESSING_HOME}/${dem_identifier%*.}_UTM_90.TIF 1>&2
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Preparing file_input.cfg" 
