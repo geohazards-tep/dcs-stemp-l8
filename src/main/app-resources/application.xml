@@ -1,16 +1,68 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="application">
   <jobTemplates>
+    <jobTemplate id="query">
+      <streamingExecutable>/application/query/run.sh</streamingExecutable>
+      <defaultParameters>
+        <parameter id="startdate" title="Start date" abstract="Format YYYY-MM-DDThh:mm:ssZ or YYYY-MM-DD" maxOccurs="1" scope="runtime"/>
+        <parameter id="enddate" title="End date" abstract="Format YYYY-MM-DDThh:mm:ssZ or YYYY-MM-DD" maxOccurs="1" scope="runtime"/>
+        <parameter id="volcano" title="Volcano name" abstract="Volcano where to perform the processing" maxOccurs="1" scope="runtime">
+          <options>
+            <option>Etna</option>
+            <option>Stromboli</option>
+            <option>Vesuvio Campi Flegrei</option>
+            <option>Puyehue-Cordon Caulle</option>
+            <option>Arenal</option>
+            <option>Poas</option>
+            <option>Turrialba</option>
+            <option>La Cumbre / Fernandina</option>
+            <option>Sangai</option>
+            <option>Sierra Negra</option>
+            <option>Piton de la Fournaise</option>
+            <option>Santiaguito</option>
+            <option>Dukono</option>
+            <option>Ibu</option>
+            <option>Merapi</option>
+            <option>Colima</option>
+            <option>Cotopaxi</option>
+            <option>Tungurahua</option>
+            <option>Reventador</option>
+            <option>Cotacachi</option>
+            <option>Sinabung</option>
+            <option>Cachimbiro</option>
+            <default>Etna</default>
+          </options>
+        </parameter>
+        <parameter id="mission" title="Mission" abstract="L1B LANDSAT8 data" maxOccurs="1" scope="runtime">
+          <options>
+            <option>LANDSAT8</option>
+            <default>LANDSAT8</default>
+          </options>
+        </parameter>
+      </defaultParameters>
+      <defaultJobconf>
+        <property id="ciop.job.max.tasks">1</property>
+      </defaultJobconf>
+    </jobTemplate>
     <jobTemplate id="stemp">
-      <streamingExecutable>/application/stemp/run</streamingExecutable>
+      <streamingExecutable>/application/stemp/run.sh</streamingExecutable>
+      <defaultJobconf>
+        <property id="mapred.task.timeout">3600000</property>
+      </defaultJobconf>
     </jobTemplate>
   </jobTemplates>
-    <workflow id="workflow" title="STEMP" abstract="Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (ASTER, LANDSAT8) generated in GeoTIFF format">
+  <workflow id="workflow" title="STEMP" abstract="Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format">
     <workflowVersion>1.0</workflowVersion>
+    <node id="node-query">
+      <job id="query"/>
+      <sources>
+        <source id="dummy" refid="string:list">dummy</source>
+      </sources>
+    </node>
     <node id="node-stemp">
       <job id="stemp"/>
       <sources>
-        <source id="input" refid="string:list" scope="runtime" title="LANDSAT8 or TERRA-ASTER input" abstract="L1B LANDSAT8 data or L1T TERRA-ASTER data">input</source>
+        <source refid="wf:node">node-query</source>
       </sources>
     </node>
   </workflow>
