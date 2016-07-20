@@ -54,11 +54,17 @@ function main() {
   ciop-log "INFO" "Converting Digital Elevation Model to GeoTIFF"
   
   local dem_filename=$( basename ${dem} )
-  local dem_identifier=${dem_filename%*.}
+  local dem_identifier=${dem_filename%.*}
+  
+  mv ${dem}.rsc ${PROCESSING_HOME}/dem.rsc
+  mv ${dem} ${PROCESSING_HOME}/dem.dem
+  
+  dem_identifier="dem"
+  
   ls -l ${PROCESSING_HOME}
   ls -l ${dem}
   
-  local dem_geotiff=$( convertDemToGeoTIFF "${dem}.rsc" "${dem}" "${dem_identifier}" "${PROCESSING_HOME}" )
+  local dem_geotiff=$( convertDemToGeoTIFF "${PROCESSING_HOME}/dem.rsc" "${PROCESSING_HOME}/dem.dem" "${dem_identifier}" "${PROCESSING_HOME}" )
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Croppig Digital Elevation Model"

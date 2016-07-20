@@ -106,7 +106,13 @@ EOF
   ciop-log "INFO" "[convertDemToGeoTIFF function] .hdr Raster:"
   cat ${target}/${identifier}.dem.hdr 1>&2
   
+  ciop-log "INFO" "gdal_translate ${dem} ${target}/${identifier}.dem.TIF"
+  
   gdal_translate ${dem} ${target}/${identifier}.dem.TIF 1>&2
+  
+  cp ${dem} /tmp/
+  cp ${target}/${identifier}.dem.hdr /tmp/
+  gdal_translate /tmp/dem.dem /tmp/dem.TIF 1>&2
   
   echo ${target}/${identifier}.dem.TIF
 }
