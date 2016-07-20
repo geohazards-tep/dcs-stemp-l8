@@ -18,7 +18,7 @@ function find_station() {
     [ -z ${dist_old} ] && dist_old=${dist}
    
     [ "$( echo ${dist} '>' ${dist_old} | bc -l )" == "0" ] && { 
-      echo ${station_id} > station_found
+      echo ${region} ${station_id} > station_found
       dist_old=${dist}
     }
   done
@@ -46,8 +46,10 @@ function main() {
   local geom="POINT(${v_lon} ${v_lat})"
 
   if [ -z ${station} ]; then
-    station=$( find_station ${v_lon} ${v_lat} )
-    [ -z ${station} ] && exit $ERR_STATION_NOT_FOUND
+    station_found=$( find_station ${v_lon} ${v_lat} )
+    [ -z ${station_found} ] && exit $ERR_STATION_NOT_FOUND
+    region=$( echo ${station_found} | cut -d ' ' -f1 )
+    station=$( echo ${station_found} | cut -d ' ' -f2 )
   fi
 
   ciop-log "INFO" "Nearest atmosferic station: ${station},${region}"

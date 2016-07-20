@@ -123,7 +123,7 @@ function main() {
   ciop-log "INFO" "UTM Zone: ${UTM_ZONE}"
     
   # If the volcano is located in southern hemisphere
-  if [ $( echo "${v_lat} < 0" | bc ) -eq 1 ];
+  if [ $( echo "${v_lat} < 0" | bc ) -eq 1 ]; then
     
     ciop-log "INFO" "Converting DEM to UTM Zone S"
     gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +datum=WGS84" ${cropped_dem} ${PROCESSING_HOME}/dem_UTM.TIF 1>&2
@@ -139,9 +139,7 @@ function main() {
       mv ${PROCESSING_HOME}/${volcano/ /_}_S.tif ${PROCESSING_HOME}/${volcano/ /_}.tif
       ciop-log "INFO" "------------------------------------------------------------"
     fi
-    
     ciop-log "INFO" "------------------------------------------------------------"
-    
   else
     ciop-log "INFO" "Converting DEM to UTM Zone N"
     gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +datum=WGS84" ${cropped_dem} ${PROCESSING_HOME}/dem_UTM.TIF 1>&2
