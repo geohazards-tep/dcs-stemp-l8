@@ -55,12 +55,7 @@ function main() {
   
   mv ${dem}.rsc ${PROCESSING_HOME}/dem.rsc
   mv ${dem} ${PROCESSING_HOME}/dem
-  
-  dem_identifier="dem"
-  
-  ls -l ${PROCESSING_HOME}
-  ls -l ${dem}
-  
+    
   local dem_geotiff=$( convertDemToGeoTIFF "${PROCESSING_HOME}/dem.rsc" "${PROCESSING_HOME}/dem" "${PROCESSING_HOME}" )
   ciop-log "INFO" "------------------------------------------------------------"
   
@@ -176,7 +171,7 @@ function main() {
   
   ciop-publish -m ${PROCESSING_HOME}/*_B10.TIF || return $?
   ciop-publish -m ${PROCESSING_HOME}/*txt || return $?
-  ciop-publish -m ${PROCESSING_HOME}/dem_UTM_90.TIF || return $?
+  ciop-publish -m ${PROCESSING_HOME}/dem* || return $?
   ciop-publish -m ${PROCESSING_HOME}/*${volcano/ /_}.tif || return $?
 
   # temporary stopping the process
