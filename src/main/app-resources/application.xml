@@ -8,28 +8,28 @@
         <parameter id="enddate" title="End date" abstract="Format YYYY-MM-DDThh:mm:ssZ or YYYY-MM-DD" maxOccurs="1" scope="runtime"/>
         <parameter id="volcano" title="Volcano name" abstract="Volcano where to perform the processing" maxOccurs="1" scope="runtime">
           <options>
-            <option>Etna</option>
-            <option>Stromboli</option>
-            <option>Vesuvio Campi Flegrei</option>
-            <option>Puyehue-Cordon Caulle</option>
             <option>Arenal</option>
-            <option>Poas</option>
-            <option>Turrialba</option>
-            <option>La Cumbre / Fernandina</option>
-            <option>Sangai</option>
-            <option>Sierra Negra</option>
-            <option>Piton de la Fournaise</option>
-            <option>Santiaguito</option>
-            <option>Dukono</option>
-            <option>Ibu</option>
-            <option>Merapi</option>
-            <option>Colima</option>
-            <option>Cotopaxi</option>
-            <option>Tungurahua</option>
-            <option>Reventador</option>
-            <option>Cotacachi</option>
-            <option>Sinabung</option>
             <option>Cachimbiro</option>
+            <option>Colima</option>
+            <option>Cotacachi</option>
+            <option>Cotopaxi</option>
+            <option>Dukono</option>
+            <option>Etna</option>
+            <option>Ibu</option>
+            <option>La Cumbre / Fernandina</option>
+            <option>Merapi</option>
+            <option>Piton de la Fournaise</option>
+            <option>Poas</option>
+            <option>Puyehue-Cordon Caulle</option>
+            <option>Reventador</option>
+            <option>Sangai</option>
+            <option>Santiaguito</option>
+            <option>Sierra Negra</option>
+            <option>Sinabung</option>
+            <option>Stromboli</option>
+            <option>Tungurahua</option>
+            <option>Turrialba</option>
+            <option>Vesuvio Campi Flegrei</option>
             <default>Etna</default>
           </options>
         </parameter>
