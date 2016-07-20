@@ -68,6 +68,78 @@ function getDem() {
 
 }
 
+
+function convertDemToGeoTIFF() {
+
+  local rsc=$1
+  local dem=$2
+  local identifier=$3
+  local target=$4
+
+  ciop-log "INFO" "[convertDemToGeoTIFF function] GeoTIFF conversion: ${utm_zone}"
+  ciop-log "INFO" "[convertDemToGeoTIFF function] Preparing ENVI .hdr Labelled Raster"
+  
+  X_FIRST = $( sed -n 's#^X_FIRST\s*\(.*\)$#\1#p' ${rsc} )
+  Y_FIRST = $( sed -n 's#^Y_FIRST\s*\(.*\)$#\1#p' ${rsc} )
+  X_STEP  = $( sed -n 's#^X_STEP\s*\(.*\)$#\1#p' ${rsc} ) 
+  
+  X_STEP = $( echo "define abs(x) {if (x<0) {return -x}; return x;}; abs(${X_STEP})" | bc )
+  X_STEP = $( printf '%.15f\n' ${X_STEP} )
+  
+cat << EOF > ${target}/${identifier}.dem.hdr
+ENVI
+description = {
+dem}
+samples = 12000
+lines   = 6000
+bands   = 1
+header offset = 0
+file type = ENVI Standard
+data type = 2
+interleave = bsq
+byte order = 0
+map info = {Geographic Lat/Lon, 1, 1, ${X_FIRST%.*}, ${Y_FIRST%.*}, ${X_STEP}, ${X_STEP}, WGS-84}
+band names = {
+dem}
+EOF
+
+  ciop-log "INFO" "[convertDemToGeoTIFF function] .hdr Raster:"
+  cat ${target}/${identifier}.dem.hdr 1>&2
+  
+  gdal_translate ${dem} ${target}/${identifier}.dem.TIF 1>&2
+  
+  echo ${target}/${identifier}.dem.TIF
+}
+
+function cropDem() {
+  
+  local dem=$1
+  local identifier=$2
+  local target=$3
+  local lon=$4
+  local lat=$5
+  local extent=$6
+  
+  ciop-log "INFO" "[cropDem function] lon: ${lon}"
+  ciop-log "INFO" "[cropDem function] lat: ${lat}"
+  ciop-log "INFO" "[cropDem function] extent: ${extent}"
+
+  local west=$( echo "${lon} - ${extent}" | bc )
+  local north=$( echo "${lat} + ${extent}" | bc )
+  local east=$( echo "${lon} + ${extent}" | bc )
+  local south=$( echo "${lat} - ${extent}" | bc )
+  
+  ciop-log "INFO" "[cropDem function] west: ${west}"
+  ciop-log "INFO" "[cropDem function] north: ${north}"
+  ciop-log "INFO" "[cropDem function] east: ${east}"
+  ciop-log "INFO" "[cropDem function] south: ${south}"
+
+  gdal_translate -of GTiff -projwin ${west} ${north} ${east} ${south} ${dem} ${target}/${identifier}_crop.TIF 1>&2
+  
+  echo ${target}/${identifier}_crop.TIF
+}
+
+
 function getData() {
  
   local ref=$1
