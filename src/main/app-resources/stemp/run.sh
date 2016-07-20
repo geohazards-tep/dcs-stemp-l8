@@ -6,6 +6,7 @@ export LM_LICENSE_FILE=1700@idl.terradue.int
 export MODTRAN_BIN=/opt/MODTRAN-5.4.0
 export STEMP_BIN=/data/code/STEMP-1.0
 export PROCESSING_HOME=${TMPDIR}/PROCESSING
+export EMISSIVITY_AUX_PATH=${_CIOP_APPLICATION_PATH}/aux/INPUT_SRF
 
 function main() {
 
@@ -17,6 +18,9 @@ function main() {
   local region=$6
   local volcano=$7
   local geom=$8
+  
+  local v_lon=$( echo "${geom}" | sed -n 's#POINT(\(.*\)\s.*)#\1#p')
+  local v_lat=$( echo "${geom}" | sed -n 's#POINT(.*\s\(.*\))#\1#p')
 
   ciop-log "INFO" "**** STEMP node ****"
   ciop-log "INFO" "------------------------------------------------------------"
@@ -45,7 +49,21 @@ function main() {
   res=$?
   [ ${res} -ne 0 ] && return ${ERR_GET_DEM}
   ciop-log "INFO" "Digital Elevation Model downloaded"
-  ciop-log "INFO" "------------------------------------------------------------" 
+  ciop-log "INFO" "------------------------------------------------------------"
+  
+  ciop-log "INFO" "Converting Digital Elevation Model to GeoTIFF"
+  local dem_identifier=$( basename ${dem} )
+  dem_identifier=${dem_identifier%*.}
+  
+  local dem_geotiff=$( convertDemToGeoTIFF "${dem}.rsc" "${dem}" "${dem_identifier}" "${PROCESSING_HOME}" )
+  ciop-log "INFO" "------------------------------------------------------------"
+  
+  ciop-log "INFO" "Croppig Digital Elevation Model"
+  
+  # Extent in degrees
+  local extent=0.2
+  local cropped_dem = $( cropDem "${dem_geotiff}" "${dem_identifier}" "${PROCESSING_HOME}" "${v_lon}" "${v_lat}" "${extent}" )
+  ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Getting input product" 
   local product=$( getData "${ref}" "${PROCESSING_HOME}" )
@@ -79,31 +97,67 @@ function main() {
   ciop-log "INFO" "Product uncompressed"
   ciop-log "INFO" "------------------------------------------------------------"
   
-  if [ "${mission,,}" = "landsat8" ]; then
-    ciop-log "INFO" "Checking Landsat 8 UTM Zone"  
+  ciop-log "INFO" "Getting the emissivity file"
+  cp ${EMISSIVITY_AUX_PATH}/${volcano/ /_}.tif ${PROCESSING_HOME}
+  
+  ciop-log "INFO" "------------------------------------------------------------"
+  
+  ciop-log "INFO" "Checking the UTM Zone"
+  
+  case ${mission,,} in
+    landsat8)
+        UTM_ZONE=$( sed -n 's#^.*UTM_ZONE\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt )
+    ;;
+    aster)
+        UTM_ZONE=$( gdalinfo ${PROCESSING_HOME}/${identifier}.hdf | sed -n 's#.*UTMZONENUMBER=\(.*\)#\1#p' )
+    ;;
+  esac
+  
+  ciop-log "INFO" "UTM Zone: ${UTM_ZONE}"
     
-    CORNER_LL_LAT_PRODUCT=$( sed -n 's#^.*CORNER_LL_LAT_PRODUCT\s=\s\(.*\)\..*$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt )
-    CORNER_LR_LAT_PRODUCT=$( sed -n 's#^.*CORNER_LR_LAT_PRODUCT\s=\s\(.*\)\..*$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt )
+  # If the volcano is located in southern hemisphere
+  if [ ${v_lat} -le 0 ]; then
     
-    # If the product is located in southern hemisphere
-    if [ ${CORNER_LL_LAT_PRODUCT} -le 0 ] || [ ${CORNER_LR_LAT_PRODUCT} -le 0 ]; then
-      ciop-log "INFO" "The product ${identifier} is located in the southern hemisphere"
-      
-      UTM_ZONE=$( sed -n 's#^.*UTM_ZONE\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt )
-      
+    ciop-log "INFO" "Converting DEM to UTM Zone S"
+    gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +datum=WGS84" ${cropped_dem} ${PROCESSING_HOME}/${dem_identifier}_UTM.TIF 1>&2
+    
+    if [ "${mission,,}" = "landsat8" ]; then
       ciop-log "INFO" "Setting the proper UTM Zone ${UTM_ZONE} for the B10 TIF"
       gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs" ${PROCESSING_HOME}/${identifier}_B10.TIF ${PROCESSING_HOME}/${identifier}_B10_S.TIF 1>&2
-      mv ${PROCESSING_HOME}/${identifier}_B10_S.TIF ${PROCESSING_HOME}/${identifier}_B10.TIF 
+      mv ${PROCESSING_HOME}/${identifier}_B10_S.TIF ${PROCESSING_HOME}/${identifier}_B10.TIF
+      ciop-log "INFO" "------------------------------------------------------------"
+      
+      ciop-log "INFO" "Setting the proper UTM Zone ${UTM_ZONE} for the emissivity file"
+      gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +datum=WGS84" ${PROCESSING_HOME}/${volcano/ /_}.tif ${PROCESSING_HOME}/${volcano/ /_}_S.tif 1>&2
+      mv ${PROCESSING_HOME}/${volcano/ /_}_S.tif ${PROCESSING_HOME}/${volcano/ /_}.tif
+      ciop-log "INFO" "------------------------------------------------------------"
     fi
     
     ciop-log "INFO" "------------------------------------------------------------"
+    
+  else
+    ciop-log "INFO" "Converting DEM to UTM Zone N"
+    gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +datum=WGS84" ${cropped_dem} ${PROCESSING_HOME}/${dem_identifier}_UTM.TIF 1>&2
+    ciop-log "INFO" "------------------------------------------------------------"
   fi
   
+  ciop-log "INFO" "Setting DEM resolution to 90m" 
+  gdalwarp -tr 90 -90 ${PROCESSING_HOME}/${dem_identifier}_UTM.TIF ${PROCESSING_HOME}/${dem_identifier}_UTM_90.TIF 1>&2
+  ciop-log "INFO" "------------------------------------------------------------"
+  
   ciop-log "INFO" "Preparing file_input.cfg" 
-  echo "$( basename ${identifier})_B10.TIF" >> ${PROCESSING_HOME}/file_input.cfg
+  case ${mission,,} in
+    landsat8)
+         echo "$( basename ${identifier})_B10.TIF" >> ${PROCESSING_HOME}/file_input.cfg
+    ;;
+    aster)
+        echo "$( basename ${identifier}).hdf" >> ${PROCESSING_HOME}/file_input.cfg
+    ;;
+  esac
+  
   basename ${profile} >> ${PROCESSING_HOME}/file_input.cfg
-  basename ${dem} >> ${PROCESSING_HOME}/file_input.cfg
-  basename ${volcano} >> ${PROCESSING_HOME}/file_input.cfg
+  echo "${dem_identifier}_UTM_90.TIF" >> ${PROCESSING_HOME}/file_input.cfg
+  echo "${volcano/ /_}.tif" >> ${PROCESSING_HOME}/file_input.cfg
 
   ciop-log "INFO" "file_input.cfg content:"
   cat ${PROCESSING_HOME}/file_input.cfg 1>&2
@@ -114,6 +168,11 @@ function main() {
   
   ciop-log "INFO" "STEMP environment ready"
   ciop-log "INFO" "------------------------------------------------------------"
+  
+  ciop-publish -m ${PROCESSING_HOME}/*_B10.TIF || return $?
+  ciop-publish -m ${PROCESSING_HOME}/*txt || return $?
+  ciop-publish -m ${PROCESSING_HOME}/*_UTM_90.TIF || return $?
+  ciop-publish -m ${PROCESSING_HOME}/*${volcano/ /_}.tif || return $?
 
   # temporary stopping the process
   exit ${SUCCESS}
