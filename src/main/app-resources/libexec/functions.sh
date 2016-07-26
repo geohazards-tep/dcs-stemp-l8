@@ -224,7 +224,7 @@ function getRas() {
     grep "Can't get" ${target}/RAW${year}${month}${day}${hour}_${station}.txt
     grep_res=$?
   
-    if [ ${curl_res} -ne 0 ] || [ ${get_res} -eq 0 ] ; then
+    if [ ${curl_res} -ne 0 ] || [ ${grep_res} -eq 0 ] ; then
       days=$((days+1))
       if [ ${days} -gt ${MAX_DAYS_BEFORE} ] ; then
         terminate=1
