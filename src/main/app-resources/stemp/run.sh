@@ -38,14 +38,14 @@ function main() {
   ln -sf /opt/MODTRAN-5.4.0/Mod5.4.0tag/DATA ${PROCESSING_HOME}/DATA
  
   ciop-log "INFO" "Getting atmospheric profile" 
-  local profile=$( getRas "${date}" "${station}" "${region}" "${PROCESSING_HOME}")
+  profile=$( getRas "${date}" "${station}" "${region}" "${PROCESSING_HOME}")
   res=$?
   [ ${res} -ne 0 ] && return ${ERR_GET_RAS}
   ciop-log "INFO" "Atmospheric profile downloaded" 
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Getting Digital Elevation Model" 
-  local dem=$( getDem "${geom}" "${PROCESSING_HOME}" )
+  dem=$( getDem "${geom}" "${PROCESSING_HOME}" )
   res=$?
   [ ${res} -ne 0 ] && return ${ERR_GET_DEM}
   ciop-log "INFO" "Digital Elevation Model downloaded"
@@ -56,18 +56,18 @@ function main() {
   mv ${dem}.rsc ${PROCESSING_HOME}/dem.rsc
   mv ${dem} ${PROCESSING_HOME}/dem
     
-  local dem_geotiff=$( convertDemToGeoTIFF "${PROCESSING_HOME}/dem.rsc" "${PROCESSING_HOME}/dem" "${PROCESSING_HOME}" )
+  dem_geotiff=$( convertDemToGeoTIFF "${PROCESSING_HOME}/dem.rsc" "${PROCESSING_HOME}/dem" "${PROCESSING_HOME}" )
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Croppig Digital Elevation Model"
   
   # Extent in degree
   local extent=0.3
-  local cropped_dem=$( cropDem "${dem_geotiff}" "${PROCESSING_HOME}" "${v_lon}" "${v_lat}" "${extent}" )
+  cropped_dem=$( cropDem "${dem_geotiff}" "${PROCESSING_HOME}" "${v_lon}" "${v_lat}" "${extent}" )
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Getting input product" 
-  local product=$( getData "${ref}" "${PROCESSING_HOME}" )
+  product=$( getData "${ref}" "${PROCESSING_HOME}" )
   res=$?
   [ ${res} -ne 0 ] && return ${ERR_GET_DATA}
   ciop-log "INFO" "Input product downloaded"

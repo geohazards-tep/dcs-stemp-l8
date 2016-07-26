@@ -48,12 +48,14 @@ function getDem() {
   ciop-log "INFO" "[getDem function] DEM WPS service endpoint: ${endpoint} "
   ciop-log "INFO" "[getDem function] WTK input: ${geom} "
   ciop-log "INFO" "[getDem function] Starting DEM WPS remote service"
-  
+ 
+  return 254
+ 
   wpsclient -a -u "${endpoint}" -p "com.terradue.wps_oozie.process.OozieAbstractAlgorithm" -Iwkt="${geom}" -e -op ${target} &>/dev/null
   res=$?
 
   ciop-log "INFO" "[getDem function] DEM WPS request completed with return code: ${res}"
-
+  
   [ ${res} -ne 0 ] && return ${res}
   
   ciop-log "INFO" "[getDem function] Extracting metalink"
@@ -219,17 +221,19 @@ function getRas() {
     
     ciop-log "INFO" "[getRas function] curl request return code: ${curl_res}"
     
-    ciop-log "INFO" "[getRas function] Checking if the atmospheric profile is valid (i.e., it doesn't contain the words \"Can't get\"): ${curl_res}"
+    ciop-log "INFO" "[getRas function] Checking if the atmospheric profile is valid (i.e., it doesn't contain the words \"Can't get\")..."
     
     grep "Can't get" ${target}/RAW${year}${month}${day}${hour}_${station}.txt
     grep_res=$?
-  
+
     if [ ${curl_res} -ne 0 ] || [ ${grep_res} -eq 0 ] ; then
       days=$((days+1))
       if [ ${days} -gt ${MAX_DAYS_BEFORE} ] ; then
         terminate=1
-        cp ${_CIOP_APPLICATION_PATH}/aux/RAS/default.txt ${target}/
-        echo ${target}/default.txt
+        cp ${_CIOP_APPLICATION_PATH}/aux/RAS/${region}.txt ${target}/
+        
+        ciop-log "INFO" "[getRas function] Provided default atmospheric profile: ${_CIOP_APPLICATION_PATH}/aux/RAS/${region}.txt"
+        echo ${target}/${region}.txt
       fi
     else
       terminate=1
