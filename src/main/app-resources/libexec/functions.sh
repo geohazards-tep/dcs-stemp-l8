@@ -51,8 +51,6 @@ function getDem() {
   ciop-log "INFO" "[getDem function] WTK input: ${geom} "
   ciop-log "INFO" "[getDem function] Starting DEM WPS remote service"
  
-  return 254
- 
   wpsclient -a -u "${endpoint}" -p "com.terradue.wps_oozie.process.OozieAbstractAlgorithm" -Iwkt="${geom}" -e -op ${target} &>/dev/null
   res=$?
 
