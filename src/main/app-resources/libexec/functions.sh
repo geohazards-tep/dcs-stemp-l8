@@ -173,7 +173,7 @@ function getRas() {
   local region=$3
   local target=$4
   local days=0
-  local MAX_DAYS_BEFORE=7
+  local MAX_DAYS_BEFORE=10
 
   # UTC format for date
   local year=${date:0:4}
@@ -215,15 +215,21 @@ function getRas() {
     ciop-log "INFO" "[getRas function] sounding url: ${sounding_url} "
 
     curl -s -o ${target}/RAW${year}${month}${day}${hour}_${station}.txt "${sounding_url}"
-    res=$?
+    curl_res=$?
     
-    ciop-log "INFO" "[getRas function] request return code: ${res}"
+    ciop-log "INFO" "[getRas function] curl request return code: ${curl_res}"
+    
+    ciop-log "INFO" "[getRas function] Checking if the atmospheric profile is valid (i.e., it doesn't contain the words \"Can't get\"): ${curl_res}"
+    
+    grep "Can't get" ${target}/RAW${year}${month}${day}${hour}_${station}.txt
+    grep_res=$?
   
-    if [ ${res} -ne 0 ] ; then
+    if [ ${curl_res} -ne 0 ] || [ ${get_res} -eq 0 ] ; then
       days=$((days+1))
       if [ ${days} -gt ${MAX_DAYS_BEFORE} ] ; then
         terminate=1
-        return ${res}
+        cp ${_CIOP_APPLICATION_PATH}/aux/RAS/default.txt ${target}/
+        echo ${target}/default.txt
       fi
     else
       terminate=1
