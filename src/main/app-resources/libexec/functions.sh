@@ -223,7 +223,7 @@ function getRas() {
     
     ciop-log "INFO" "[getRas function] Checking if the atmospheric profile is valid (i.e., it doesn't contain the words \"Can't get\")..."
     
-    grep "Can't get" ${TMPDIR}/RAW${year}${month}${day}${hour}_${station}.txt
+    grep "Can't get" ${TMPDIR}/RAW${year}${month}${day}${hour}_${station}.txt > /dev/null 2>&1
     grep_res=$?
 
     if [ ${curl_res} -ne 0 ] || [ ${grep_res} -eq 0 ] ; then

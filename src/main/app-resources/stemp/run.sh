@@ -41,7 +41,7 @@ function main() {
  
   ciop-log "INFO" "Getting atmospheric profile" 
   profile=$( getRas "${date}" "${station}" "${region}" "${PROCESSING_HOME}") || return ${ERR_GET_RAS}
-  ciop-log "INFO" "Atmospheric profile downloaded: ${profile}" 
+  ciop-log "INFO" "Atmospheric profile downloaded:" 
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Getting Digital Elevation Model" 
