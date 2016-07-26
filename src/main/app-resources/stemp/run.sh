@@ -22,6 +22,8 @@ function main() {
   local v_lon=$( echo "${geom}" | sed -n 's#POINT(\(.*\)\s.*)#\1#p')
   local v_lat=$( echo "${geom}" | sed -n 's#POINT(.*\s\(.*\))#\1#p')
 
+  volcano=$( echo ${volcano} | tr ' ' _ )
+
   ciop-log "INFO" "**** STEMP node ****"
   ciop-log "INFO" "------------------------------------------------------------"
   ciop-log "INFO" "Mission: ${mission}" 
@@ -39,7 +41,7 @@ function main() {
  
   ciop-log "INFO" "Getting atmospheric profile" 
   profile=$( getRas "${date}" "${station}" "${region}" "${PROCESSING_HOME}") || return ${ERR_GET_RAS}
-  ciop-log "INFO" "Atmospheric profile downloaded" 
+  ciop-log "INFO" "Atmospheric profile downloaded: ${profile}" 
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Getting Digital Elevation Model" 
@@ -93,8 +95,8 @@ function main() {
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Getting the emissivity file and spectral response functions"
-  ciop-log "INFO" "${EMISSIVITY_AUX_PATH}/${volcano/ /_}.tif"
-  cp ${EMISSIVITY_AUX_PATH}/${volcano/ /_}.tif ${PROCESSING_HOME}
+  ciop-log "INFO" "${EMISSIVITY_AUX_PATH}/${volcano}.tif"
+  cp ${EMISSIVITY_AUX_PATH}/${volcano}.tif ${PROCESSING_HOME}
   cp ${EMISSIVITY_AUX_PATH}/*.txt ${PROCESSING_HOME}
   
   ciop-log "INFO" "------------------------------------------------------------"
@@ -125,8 +127,8 @@ function main() {
       ciop-log "INFO" "------------------------------------------------------------"
       
       ciop-log "INFO" "Setting the proper UTM Zone ${UTM_ZONE} for the emissivity file"
-      gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +datum=WGS84" ${PROCESSING_HOME}/${volcano/ /_}.tif ${PROCESSING_HOME}/${volcano/ /_}_S.tif 1>&2
-      mv ${PROCESSING_HOME}/${volcano/ /_}_S.tif ${PROCESSING_HOME}/${volcano/ /_}.tif
+      gdalwarp -t_srs "+proj=utm +zone=${UTM_ZONE} +south +datum=WGS84" ${PROCESSING_HOME}/${volcano}.tif ${PROCESSING_HOME}/${volcano}_S.tif 1>&2
+      mv ${PROCESSING_HOME}/${volcano}_S.tif ${PROCESSING_HOME}/${volcano}.tif
       ciop-log "INFO" "------------------------------------------------------------"
     fi
     ciop-log "INFO" "------------------------------------------------------------"
@@ -152,7 +154,7 @@ function main() {
   
   basename ${profile} >> ${PROCESSING_HOME}/file_input.cfg
   echo "dem_UTM_90.TIF" >> ${PROCESSING_HOME}/file_input.cfg
-  echo "${volcano/ /_}.tif" >> ${PROCESSING_HOME}/file_input.cfg
+  echo "${volcano}.tif" >> ${PROCESSING_HOME}/file_input.cfg
 
   ciop-log "INFO" "file_input.cfg content:"
   cat ${PROCESSING_HOME}/file_input.cfg 1>&2
@@ -168,7 +170,7 @@ function main() {
   ciop-publish -m ${PROCESSING_HOME}/*_B10.TIF || return $?
   ciop-publish -m ${PROCESSING_HOME}/*txt || return $?
   ciop-publish -m ${PROCESSING_HOME}/dem* || return $?
-  ciop-publish -m ${PROCESSING_HOME}/*${volcano/ /_}.tif || return $?
+  ciop-publish -m ${PROCESSING_HOME}/*${volcano}.tif || return $?
 
   ciop-log "INFO" "Starting STEMP core"
   /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav -IDL_DEVICE Z  

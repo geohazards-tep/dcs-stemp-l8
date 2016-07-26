@@ -216,14 +216,14 @@ function getRas() {
 
     ciop-log "INFO" "[getRas function] sounding url: ${sounding_url} "
 
-    curl -s -o ${target}/RAW${year}${month}${day}${hour}_${station}.txt "${sounding_url}"
+    curl -s -o ${TMPDIR}/RAW${year}${month}${day}${hour}_${station}.txt "${sounding_url}"
     curl_res=$?
     
     ciop-log "INFO" "[getRas function] curl request return code: ${curl_res}"
     
     ciop-log "INFO" "[getRas function] Checking if the atmospheric profile is valid (i.e., it doesn't contain the words \"Can't get\")..."
     
-    grep "Can't get" ${target}/RAW${year}${month}${day}${hour}_${station}.txt
+    grep "Can't get" ${TMPDIR}/RAW${year}${month}${day}${hour}_${station}.txt
     grep_res=$?
 
     if [ ${curl_res} -ne 0 ] || [ ${grep_res} -eq 0 ] ; then
@@ -233,11 +233,13 @@ function getRas() {
         cp ${_CIOP_APPLICATION_PATH}/aux/RAS/${region}.txt ${target}/
         
         ciop-log "INFO" "[getRas function] Provided default atmospheric profile: ${_CIOP_APPLICATION_PATH}/aux/RAS/${region}.txt"
-        echo ${target}/${region}.txt
+        echo "${target}/${region}.txt"
       fi
     else
       terminate=1
-      echo ${target}/RAW${year}${month}${day}${hour}_${station}.txt
+      cp ${TMPDIR}/RAW${year}${month}${day}${hour}_${station}.txt ${target}/
+
+      echo "${target}/RAW${year}${month}${day}${hour}_${station}.txt"
     fi
   done
 }
