@@ -9,14 +9,14 @@
         <parameter id="volcano" title="Volcano name" abstract="Volcano where to perform the processing" maxOccurs="1" scope="runtime">
           <options>
             <option>Arenal</option>
-            <option>Cachimbiro</option>
+            <option>Chachimbiro</option>
             <option>Colima</option>
             <option>Cotacachi</option>
             <option>Cotopaxi</option>
             <option>Dukono</option>
             <option>Etna</option>
             <option>Ibu</option>
-            <option>La Cumbre / Fernandina</option>
+            <option>La Cumbre Fernandina</option>
             <option>Merapi</option>
             <option>Piton de la Fournaise</option>
             <option>Poas</option>
