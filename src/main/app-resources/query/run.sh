@@ -37,7 +37,7 @@ function main() {
   [ -z ${startdate} ] && exit $ERR_PARAM
   [ -z ${enddate} ] && exit $ERR_PARAM
  
-  IFS=',' read volcano v_lon v_lat station region < <( cat ${DB_PATH}/volcanoes | grep ${volcano,,} )
+  IFS=',' read volcano v_lon v_lat station region < <( cat ${DB_PATH}/volcanoes | grep "${volcano,,}" )
   [ -z ${volcano} ] && exit $ERR_VOLCANO_NOT_FOUND
 
   ciop-log "INFO" "Volcano name: ${volcano}"
