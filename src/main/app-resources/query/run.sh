@@ -38,7 +38,7 @@ function main() {
   [ -z ${enddate} ] && exit $ERR_PARAM
  
   IFS=',' read volcano v_lon v_lat station region < <( cat ${DB_PATH}/volcanoes | grep "${volcano,,}" )
-  [ -z ${volcano} ] && exit $ERR_VOLCANO_NOT_FOUND
+  [ -z "${volcano}" ] && exit $ERR_VOLCANO_NOT_FOUND
 
   ciop-log "INFO" "Volcano name: ${volcano}"
   ciop-log "INFO" "Volcano coordinates: ${v_lon} ${v_lat}"
@@ -47,7 +47,7 @@ function main() {
 
   if [ -z "${station}" ]; then
     station_found=$( find_station ${v_lon} ${v_lat} )
-    [ -z ${station_found} ] && exit $ERR_STATION_NOT_FOUND
+    [ -z "${station_found}" ] && exit $ERR_STATION_NOT_FOUND
     region=$( echo ${station_found} | cut -d ' ' -f1 )
     station=$( echo ${station_found} | cut -d ' ' -f2 )
   fi
