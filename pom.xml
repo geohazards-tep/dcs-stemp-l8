@@ -219,6 +219,7 @@
           <requires>
             <require>miniconda-3.8.3</require>
             <require>idl</require>
+            <require>MODTRAN</require>
             <require>bc</require>
           </requires>
         </configuration>
