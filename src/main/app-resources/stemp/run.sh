@@ -41,7 +41,7 @@ function main() {
  
   ciop-log "INFO" "Getting atmospheric profile" 
   profile=$( getRas "${date}" "${station}" "${region}" "${PROCESSING_HOME}") || return ${ERR_GET_RAS}
-  ciop-log "INFO" "Atmospheric profile downloaded:" 
+  ciop-log "INFO" "Atmospheric profile downloaded" 
   ciop-log "INFO" "------------------------------------------------------------"
   
   ciop-log "INFO" "Getting Digital Elevation Model" 
@@ -167,10 +167,10 @@ function main() {
   ciop-log "INFO" "------------------------------------------------------------"
   
   # temporary publish
-  ciop-publish -m ${PROCESSING_HOME}/*_B10.TIF || return $?
-  ciop-publish -m ${PROCESSING_HOME}/*txt || return $?
-  ciop-publish -m ${PROCESSING_HOME}/dem* || return $?
-  ciop-publish -m ${PROCESSING_HOME}/*${volcano}.tif || return $?
+  #ciop-publish -m ${PROCESSING_HOME}/*_B10.TIF || return $?
+  #ciop-publish -m ${PROCESSING_HOME}/*txt || return $?
+  #ciop-publish -m ${PROCESSING_HOME}/dem* || return $?
+  #ciop-publish -m ${PROCESSING_HOME}/*${volcano}.tif || return $?
 
   ciop-log "INFO" "Starting STEMP core"
   /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav -IDL_DEVICE Z  
@@ -183,7 +183,9 @@ function main() {
   cd ${PROCESSING_HOME}
   string_inp=$(head -n 1 file_input.cfg)
   leng=${#string_inp}
-  gdal_translate -scale -10 10 0 255 -ot Byte -of PNG ${string_inp:0:leng-4}_TEMP.tif ${string_inp:0:leng-4}_TEMP.png
+  generateQuicklook ${PROCESSING_HOME}/${string_inp:0:leng-4}_TEMP.tif ${PROCESSING_HOME}
+  #gdal_translate -scale -10 10 0 255 -ot Byte -of PNG ${string_inp:0:leng-4}_TEMP.tif ${string_inp:0:leng-4}_TEMP.png
+  
   listgeo -tfw ${string_inp:0:leng-4}_TEMP.tif
   mv ${string_inp:0:leng-4}_TEMP.tfw ${string_inp:0:leng-4}_TEMP.pngw
   
@@ -193,7 +195,8 @@ function main() {
   
   ciop-log "INFO" "Staging-out results ..."
   ciop-publish -m ${PROCESSING_HOME}/*TEMP.tif || return $?
-  ciop-publish -m ${PROCESSING_HOME}/*TEMP.png* || return $?
+  ciop-publish -m ${PROCESSING_HOME}/*TEMP.png || return $?
+  ciop-publish -m ${PROCESSING_HOME}/*TEMP.pngw || return $?
   [ ${res} -ne 0 ] && return ${ERR_PUBLISH}
   
   ciop-log "INFO" "Results staged out"
