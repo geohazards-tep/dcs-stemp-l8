@@ -4,7 +4,7 @@ source /application/libexec/functions.sh
 
 export LM_LICENSE_FILE=1700@idl.terradue.int
 export MODTRAN_BIN=/opt/MODTRAN-5.4.0
-export STEMP_BIN=/data/code/STEMP-1.0
+export STEMP_BIN=/opt/STEMP/bin
 export PROCESSING_HOME=${TMPDIR}/PROCESSING
 export EMISSIVITY_AUX_PATH=${_CIOP_APPLICATION_PATH}/aux/INPUT_SRF
 

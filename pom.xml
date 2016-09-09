@@ -219,8 +219,9 @@
           <requires>
             <require>miniconda</require>
             <require>idl</require>
-            <require>MODTRAN</require>
             <require>bc</require>
+            <require>MODTRAN</require>
+            <require>STEMP</require>
           </requires>
         </configuration>
       </plugin>
