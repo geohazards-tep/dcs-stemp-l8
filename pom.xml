@@ -219,6 +219,7 @@
           <requires>
             <require>miniconda</require>
             <require>idl</require>
+            <require>openjpeg2</require>
             <require>bc</require>
             <require>MODTRAN</require>
             <require>STEMP</require>
