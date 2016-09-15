@@ -57,18 +57,27 @@ function main() {
 
   ciop-log "INFO" "Opensearch query: opensearch-client -p \"start=${startdate}\" -p \"stop=${enddate}\" \"https://data2.terradue.com/eop/${mission,,}/dataset/search?geom=${geom}\""
  
-  # TODO: (1) Check return code of the opensearch-client
   opensearch-client \
     -p "start=${startdate}" \
     -p "stop=${enddate}" \
     "https://data2.terradue.com/eop/${mission,,}/dataset/search?geom=${geom}" \
-    self,identifier,enddate | tr "," " " | while read self identifier enddate
-  do
-
-    ciop-log "INFO" "Publishing to the stemp node: ${self},${identifier},${mission,,},${enddate},${station},${region},${volcano},${geom}"
-    echo "${self},${identifier},${mission,,},${enddate},${station},${region},${volcano},${geom}" | ciop-publish -s
-
-  done
+    self,identifier,enddate | tr "," " " > ${TMPDIR}/opensearch_response.txt
+  res=$?
+  [ ${res} -ne 0 ] && return ${ERR_GET_DATA}
+  
+  count=$( wc -l < ${TMPDIR}/opensearch_response.txt )
+  
+  if [ ${count} -gt 0 ]; then
+      
+    cat ${TMPDIR}/opensearch_response.txt | while read self identifier enddate
+    do
+      ciop-log "INFO" "Publishing to the stemp node: ${self},${identifier},${mission,,},${enddate},${station},${region},${volcano},${geom}"
+      echo "${self},${identifier},${mission,,},${enddate},${station},${region},${volcano},${geom}" | ciop-publish -s
+    done
+    
+  else
+    return ${ERR_DATA_NOT_FOUND}
+  fi
 
 } 
 
