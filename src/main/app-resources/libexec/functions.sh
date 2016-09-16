@@ -14,6 +14,7 @@ ERR_GET_DEM=14
 ERR_GET_RAS=15
 ERR_CONV_DEM=16
 ERR_CROP_DEM=17
+ERR_DATA_NOT_FOUND=18
 ERR_UNCOMP=254
 ERR_PUBLISH=255
 
@@ -30,6 +31,7 @@ function cleanExit () {
     $ERR_GET_DATA)          msg="Error getting the input data";;
     $ERR_GET_DEM)           msg="Error getting the digital elevation model";;
     $ERR_GET_RAS)           msg="Error getting the athmosferic profile";;
+    $ERR_DATA_NOT_FOUND)    msg="Data not found on the Catalogue";;
     $ERR_UNCOMP)            msg="Failed uncompressing product";;
     $ERR_PUBLISH)           msg="Failed results publish";;
     *)                      msg="Unknown error";;
@@ -77,7 +79,7 @@ function generateQuicklook() {
   basename=$( basename ${input} )
   filename=${basename%.*}
 
-  /opt/anaconda/bin/gdal_translate -a_nodata 0 -scale -10 10 0 255 -of VRT ${input} ${target}/${filename}.vrt
+  /opt/anaconda/bin/gdal_translate -a_nodata 0 -scale -10 80 0 255 -of VRT ${input} ${target}/${filename}.vrt
 
   xmlstarlet ed -L -u '/VRTDataset/VRTRasterBand/ColorInterp' -v "Palette" ${target}/${filename}.vrt
   xmlstarlet ed -L -s '/VRTDataset/VRTRasterBand' -t elem -n "ColorTable" -v "" ${target}/${filename}.vrt
