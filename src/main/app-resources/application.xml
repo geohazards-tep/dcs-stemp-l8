@@ -51,7 +51,7 @@
       </defaultJobconf>
     </jobTemplate>
   </jobTemplates>
-  <workflow id="workflow" title="STEMP" abstract="Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format">
+  <workflow id="dcs-stemp-l8" title="STEMP-L8" abstract="Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format">
     <workflowVersion>1.0</workflowVersion>
     <node id="node-query">
       <job id="query"/>
