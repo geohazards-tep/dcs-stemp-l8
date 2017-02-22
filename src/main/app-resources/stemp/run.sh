@@ -175,6 +175,7 @@ function main() {
 
   ciop-log "INFO" "Starting STEMP core"
   /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav -IDL_DEVICE Z
+  /usr/local/bin/idl -rt=${STEMP_BIN}/classificazione.sav -IDL_DEVICE Z
 
   ciop-log "INFO" "STEMP core finished"
   ciop-log "INFO" "------------------------------------------------------------"
@@ -184,7 +185,7 @@ function main() {
   cd ${PROCESSING_HOME}
   string_inp=$(head -n 1 file_input.cfg)
   leng=${#string_inp}
-  generateQuicklook ${PROCESSING_HOME}/${string_inp:0:leng-4}_TEMP.tif ${PROCESSING_HOME}
+  generateQuicklook ${PROCESSING_HOME}/${string_inp:0:leng-4}_TEMPclass.tif ${PROCESSING_HOME}
   #gdal_translate -scale -10 10 0 255 -ot Byte -of PNG ${string_inp:0:leng-4}_TEMP.tif ${string_inp:0:leng-4}_TEMP.png
   #listgeo -tfw ${string_inp:0:leng-4}_TEMP.tif
   #mv ${string_inp:0:leng-4}_TEMP.tfw ${string_inp:0:leng-4}_TEMP.pngw
@@ -209,6 +210,7 @@ echo "Emissivity=ASTER05" >> ${METAFILE}
 echo "Atmospheric\ Profile=${profile}" >> ${METAFILE}
 echo "DEM\ Spatial\ Resolution=90mt" >> ${METAFILE}
 echo "Temperature\ Unit=degree" >> ${METAFILE}
+echo "image_url=https://store.terradue.com/api/ingv-stemp/images/colorbar-stemp-l8.png" >> ${METAFILE}
 echo "#EOF" >> ${METAFILE}
 
   ciop-log "INFO" "Staging-out results ..."

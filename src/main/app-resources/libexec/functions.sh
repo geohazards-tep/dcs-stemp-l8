@@ -79,18 +79,18 @@ function generateQuicklook() {
   basename=$( basename ${input} )
   filename=${basename%.*}
 
-  /opt/anaconda/bin/gdal_translate -a_nodata 0 -scale -10 80 0 255 -of VRT ${input} ${target}/${filename}.vrt
+  /opt/anaconda/bin/gdal_translate -a_nodata 0 -scale 0 17 0 255 -of VRT ${input} ${target}/${filename}.vrt
 
   xmlstarlet ed -L -u '/VRTDataset/VRTRasterBand/ColorInterp' -v "Palette" ${target}/${filename}.vrt
   xmlstarlet ed -L -s '/VRTDataset/VRTRasterBand' -t elem -n "ColorTable" -v "" ${target}/${filename}.vrt
 
-  cat ${_CIOP_APPLICATION_PATH}/aux/Palette/heat4.txt | while read r g b a
+  
+  cat ${_CIOP_APPLICATION_PATH}/aux/Palette/colors.txt | while read r g b 
   do
     xmlstarlet ed -L -s '/VRTDataset/VRTRasterBand/ColorTable' -t elem -n 'EntryTMP' -v '' \
        -i '/VRTDataset/VRTRasterBand/ColorTable/EntryTMP' -t attr -n c1 -v "${r}" \
        -i '/VRTDataset/VRTRasterBand/ColorTable/EntryTMP' -t attr -n c2 -v "${g}" \
        -i '/VRTDataset/VRTRasterBand/ColorTable/EntryTMP' -t attr -n c3 -v "${b}" \
-       -i '/VRTDataset/VRTRasterBand/ColorTable/EntryTMP' -t attr -n c4 -v "${a}" \
        -r '/VRTDataset/VRTRasterBand/ColorTable/EntryTMP' -v 'Entry' ${target}/${filename}.vrt
   done
 
