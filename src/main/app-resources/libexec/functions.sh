@@ -1,9 +1,9 @@
 #!/bin/bash
- 
+
 # source the ciop functions (e.g. ciop-log)
 source ${ciop_job_include}
 
-export PATH=/opt/anaconda/bin:/application/bin:$PATH 
+export PATH=/opt/anaconda/bin:/application/bin:$PATH
 
 SUCCESS=0
 ERR_INVALID_MISSION=10
@@ -20,7 +20,7 @@ ERR_PUBLISH=255
 
 # add a trap to exit gracefully
 function cleanExit () {
-  
+
   local retval=$?
   local msg=""
   case "$retval" in
@@ -44,28 +44,28 @@ trap cleanExit EXIT
 
 function getDem() {
 
-  local geom=$1 
+  local geom=$1
   local target=$2
 
-  endpoint="http://dem-90m-wkt.platform.terradue.int:8080/wps/WebProcessingService" 
+  endpoint="http://dem-90m-wkt.platform.terradue.int:8080/wps/WebProcessingService"
 
   ciop-log "INFO" "[getDem function] DEM WPS service endpoint: ${endpoint} "
   ciop-log "INFO" "[getDem function] WTK input: ${geom} "
   ciop-log "INFO" "[getDem function] Starting DEM WPS remote service"
- 
+
   wpsclient -a -u "${endpoint}" -p "com.terradue.wps_oozie.process.OozieAbstractAlgorithm" -Iwkt="${geom}" -e -op ${target} &>/dev/null
   res=$?
 
   ciop-log "INFO" "[getDem function] DEM WPS request completed with return code: ${res}"
-  
+
   [ ${res} -ne 0 ] && return ${res}
-  
+
   ciop-log "INFO" "[getDem function] Extracting metalink"
-  
+
   metalink=$(cat ${target}/response.xml | xsltproc /usr/lib/ciop/xsl/wps2meta.xsl - | sed 's#\(.*OPEN\).*#\1#g')
 
   ciop-log "INFO" "[getDem function] Metalink: ${metalink}"
-  
+
   xsltproc /usr/lib/ciop/xsl/meta2url.xsl ${metalink} | while read link; do
     echo ${link} | tr -d '\r' | ciop-copy -O $target -
   done
@@ -84,8 +84,8 @@ function generateQuicklook() {
   xmlstarlet ed -L -u '/VRTDataset/VRTRasterBand/ColorInterp' -v "Palette" ${target}/${filename}.vrt
   xmlstarlet ed -L -s '/VRTDataset/VRTRasterBand' -t elem -n "ColorTable" -v "" ${target}/${filename}.vrt
 
-  
-  cat ${_CIOP_APPLICATION_PATH}/aux/Palette/colors.txt | while read r g b 
+
+  cat ${_CIOP_APPLICATION_PATH}/aux/Palette/colors.txt | while read r g b
   do
     xmlstarlet ed -L -s '/VRTDataset/VRTRasterBand/ColorTable' -t elem -n 'EntryTMP' -v '' \
        -i '/VRTDataset/VRTRasterBand/ColorTable/EntryTMP' -t attr -n c1 -v "${r}" \
@@ -108,7 +108,7 @@ function convertDemToGeoTIFF() {
 
   ciop-log "INFO" "[convertDemToGeoTIFF function] GeoTIFF conversion: ${utm_zone}"
   ciop-log "INFO" "[convertDemToGeoTIFF function] Preparing ENVI .hdr Labelled Raster"
-  
+
   X_FIRST=$( sed -n 's#^X_FIRST\s*\(.*\)$#\1#p' ${rsc} )
   Y_FIRST=$( sed -n 's#^Y_FIRST\s*\(.*\)$#\1#p' ${rsc} )
   X_STEP=$( sed -n 's#^X_STEP\s*\(.*\)$#\1#p' ${rsc} )
@@ -117,7 +117,7 @@ function convertDemToGeoTIFF() {
 
   X_STEP=$( echo "define abs(x) {if (x<0) {return -x}; return x;}; abs(${X_STEP})" | bc )
   X_STEP=$( printf '%.15f\n' ${X_STEP} )
-  
+
 cat << EOF > ${target}/dem.hdr
 ENVI
 description = {
@@ -137,22 +137,22 @@ EOF
 
   ciop-log "INFO" "[convertDemToGeoTIFF function] .hdr Raster:"
   cat ${target}/dem.hdr 1>&2
-  
+
   ciop-log "INFO" "gdal_translate ${dem} ${target}/dem.TIF"
-  
+
   gdal_translate ${dem} ${target}/dem.TIF 1>&2
-  
+
   echo ${target}/dem.TIF
 }
 
 function cropDem() {
-  
+
   local dem=$1
   local target=$2
   local lon=$3
   local lat=$4
   local extent=$5
-  
+
   ciop-log "INFO" "[cropDem function] lon: ${lon}"
   ciop-log "INFO" "[cropDem function] lat: ${lat}"
   ciop-log "INFO" "[cropDem function] extent: ${extent}"
@@ -161,20 +161,20 @@ function cropDem() {
   local north=$( echo "${lat} + ${extent}" | bc )
   local east=$( echo "${lon} + ${extent}" | bc )
   local south=$( echo "${lat} - ${extent}" | bc )
-  
+
   ciop-log "INFO" "[cropDem function] west: ${west}"
   ciop-log "INFO" "[cropDem function] north: ${north}"
   ciop-log "INFO" "[cropDem function] east: ${east}"
   ciop-log "INFO" "[cropDem function] south: ${south}"
 
   gdal_translate -of GTiff -projwin ${west} ${north} ${east} ${south} ${dem} ${target}/dem_crop.TIF 1>&2
-  
+
   echo ${target}/dem_crop.TIF
 }
 
 
 function getData() {
- 
+
   local ref=$1
   local target=$2
   local local_file
@@ -184,22 +184,23 @@ function getData() {
   if [ "${ref:0:4}" == "file" ] || [ "${ref:0:1}" == "/" ]; then
     enclosure=${ref}
   else
-    enclosure=$( urlResolver "${ref}" )
+    #enclosure=$( urlResolver "${ref}" )
+    enclosure=$( opensearch-client "${ref}" enclosure )
     res=$?
     [ "${res}" -ne "0" ] && ${ERR_GETDATA}
   fi
 
   ciop-log "INFO" "[getData function] Data enclosure url: ${enclosure}"
-  
+
   local_file="$( echo ${enclosure} | ciop-copy -f -U -O ${target} - 2> /dev/null )"
   res=$?
   [ "${res}" -ne "0" ] && return ${ERR_GETDATA}
-  
+
   echo ${local_file}
 }
 
 function getRas() {
-      
+
   local date=$1
   local station=$2
   local region=$3
@@ -212,9 +213,9 @@ function getRas() {
   local month=${date:5:2}
   local day=${date:8:2}
   local hour=${date:11:2}
-  
+
   ref_date="${year}-${month}-${day}"
- 
+
   # Implementing rule defined at https://support.terradue.com/issues/4434
   if [ ${hour} -le 5 ]; then
     hour="00"
@@ -227,32 +228,32 @@ function getRas() {
       ciop-log "INFO" "[getRas function] Since hour is greater than 17:59, we get the atmospheric profile of the day after at ${hour}"
     fi
   fi
-  
+
   local terminate=0
 
   while [ ${terminate} -eq 0 ] ; do
-    
+
     local new_date=$(date -d "${ref_date} -${days} day" '+%Y-%m-%d')
-    
+
     year=${new_date:0:4}
     month=${new_date:5:2}
     day=${new_date:8:2}
-    
+
     if [ ${days} -gt 0 ]; then
       ciop-log "INFO" "[getRas function] Trying to get atmospheric profile ${days} day(s) before"
     fi
-    
+
     local sounding_url="http://weather.uwyo.edu/cgi-bin/sounding?region=${region}&TYPE=TEXT%3ALIST&YEAR=${year}&MONTH=${month}&FROM=${day}${hour}&TO=${day}${hour}&STNM=${station}"
 
     ciop-log "INFO" "[getRas function] sounding url: ${sounding_url} "
 
     curl -s -o ${TMPDIR}/RAW${year}${month}${day}${hour}_${station}.txt "${sounding_url}"
     curl_res=$?
-    
+
     ciop-log "INFO" "[getRas function] curl request return code: ${curl_res}"
-    
+
     ciop-log "INFO" "[getRas function] Checking if the atmospheric profile is valid (i.e., it doesn't contain the words \"Can't get\")..."
-    
+
     grep "Can't get" ${TMPDIR}/RAW${year}${month}${day}${hour}_${station}.txt > /dev/null 2>&1
     grep_res=$?
 
@@ -261,7 +262,7 @@ function getRas() {
       if [ ${days} -gt ${MAX_DAYS_BEFORE} ] ; then
         terminate=1
         cp ${_CIOP_APPLICATION_PATH}/aux/RAS/${region}.txt ${target}/
-        
+
         ciop-log "INFO" "[getRas function] Provided default atmospheric profile: ${_CIOP_APPLICATION_PATH}/aux/RAS/${region}.txt"
         echo "${target}/${region}.txt"
       fi
@@ -278,11 +279,11 @@ function urlResolver() {
 
   local url=""
   local reference="$1"
-  
+
   # Managing the special case for Landsat8, where we get data directly from
   # Google
   landsat8=$( echo "${reference}" | grep "landsat8" )
-  
+
   if [ -n "${landsat8}" ]; then
     read identifier path < <( opensearch-client -m EOP  "${reference}" identifier,wrsLongitudeGrid | tr "," " " )
     [ -z "${path}" ] && path="$( echo ${identifier} | cut -c 4-6)"
