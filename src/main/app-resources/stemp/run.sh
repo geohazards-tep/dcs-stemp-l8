@@ -175,7 +175,7 @@ function main() {
 
   ciop-log "INFO" "Starting STEMP core"
   /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav -IDL_DEVICE Z
-  /usr/local/bin/idl -rt=${STEMP_BIN}/classificazione.sav -IDL_DEVICE Z
+  #/usr/local/bin/idl -rt=${STEMP_BIN}/classificazione.sav -IDL_DEVICE Z
 
   ciop-log "INFO" "STEMP core finished"
   ciop-log "INFO" "------------------------------------------------------------"
@@ -199,7 +199,7 @@ SATELLITE=$(sed -n 's#^.*SPACECRAFT_ID\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${id
 DATATIME=$(sed -n 's#^.*FILE_DATE\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt)
 SCENE=$(sed -n 's#^.*LANDSAT_SCENE_ID\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt)
 echo "#Predefined Metadata" >> ${METAFILE}
-echo "title=STEMP - Surface Temperature Map - ${SCENE:1:21}" >> ${METAFILE}
+echo "title=STEMP - Surface Temperature Map - ${SCENE:1:21}" - ${DATATIME} >> ${METAFILE}
 echo "date=${DATATIME}" >> ${METAFILE}
 echo "Volcano=${volcano}" >> ${METAFILE}
 echo "#Input scene" >> ${METAFILE}
@@ -215,7 +215,7 @@ echo "#EOF" >> ${METAFILE}
 
   ciop-log "INFO" "Staging-out results ..."
   ciop-publish -m ${PROCESSING_HOME}/*TEMP.tif || return $?
-  ciop-publish -m ${PROCESSING_HOME}/*TEMP.png* || return $?
+  ciop-publish -m ${PROCESSING_HOME}/*TEMP*.png* || return $?
   ciop-publish -m ${METAFILE} || return $?
   [ ${res} -ne 0 ] && return ${ERR_PUBLISH}
 

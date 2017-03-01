@@ -6,7 +6,7 @@
   <packaging>pom</packaging>
   <name>dcs-stemp</name>
   <description>Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format</description>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
