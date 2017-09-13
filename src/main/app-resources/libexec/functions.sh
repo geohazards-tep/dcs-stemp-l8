@@ -47,7 +47,7 @@ function getDem() {
   local geom=$1
   local target=$2
 
-  endpoint="http://dem-90m-wkt.platform.terradue.int:8080/wps/WebProcessingService"
+  endpoint="http://dem-90m-wkt-platform.terradue.com/wps/WebProcessingService"
 
   ciop-log "INFO" "[getDem function] DEM WPS service endpoint: ${endpoint} "
   ciop-log "INFO" "[getDem function] WTK input: ${geom} "
@@ -62,7 +62,8 @@ function getDem() {
 
   ciop-log "INFO" "[getDem function] Extracting metalink"
 
-  metalink=$(cat ${target}/response.xml | xsltproc /usr/lib/ciop/xsl/wps2meta.xsl - | sed 's#\(.*OPEN\).*#\1#g')
+  #metalink=$(cat ${target}/response.xml | xsltproc /usr/lib/ciop/xsl/wps2meta.xsl - | sed 's#\(.*OPEN\).*#\1#g')
+  metalink=$(cat ${target}/response.xml | xsltproc /usr/lib/ciop/xsl/wps2meta.xsl - | tr -d '\r')
 
   ciop-log "INFO" "[getDem function] Metalink: ${metalink}"
 
