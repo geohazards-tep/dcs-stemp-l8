@@ -2,7 +2,7 @@
 
 source /application/libexec/functions.sh
 
-export LM_LICENSE_FILE=1700@idl.terradue.int
+export LM_LICENSE_FILE=1700@idl.terradue.com
 export MODTRAN_BIN=/opt/MODTRAN-5.4.0
 export STEMP_BIN=/opt/STEMP/bin
 export PROCESSING_HOME=${TMPDIR}/PROCESSING
