@@ -66,7 +66,7 @@ function main() {
 
   ciop-log "INFO" "Getting input product"
   product=$( getData "${ref}" "${PROCESSING_HOME}" ) || return ${ERR_GET_DATA}
-  ciop-log "INFO" "Input product downloaded"
+  ciop-log "INFO" "Input product downloaded : $product"
   ciop-log "INFO" "------------------------------------------------------------"
 
   ciop-log "INFO" "Uncompressing product"
@@ -102,6 +102,8 @@ function main() {
   ciop-log "INFO" "------------------------------------------------------------"
 
   ciop-log "INFO" "Checking the UTM Zone"
+
+  identifier=$(find ${PROCESSING_HOME} -name "*_MTL.txt" -printf "%f\n" | cut -d '_' -f1-7)
 
   case ${mission,,} in
     landsat8)
@@ -176,12 +178,12 @@ function main() {
   ciop-log "INFO" "Starting STEMP core"
   /usr/local/bin/idl -rt=${STEMP_BIN}/STEMP.sav -IDL_DEVICE Z
   #/usr/local/bin/idl -rt=${STEMP_BIN}/classificazione.sav -IDL_DEVICE Z
-
   ciop-log "INFO" "STEMP core finished"
   ciop-log "INFO" "------------------------------------------------------------"
 
   ciop-log "INFO" "Generating quicklooks"
-
+  ciop-log "INFO" "PROCESSING_HOME content:"
+  ls -l ${PROCESSING_HOME} 1>&2
   cd ${PROCESSING_HOME}
   string_inp=$(head -n 1 file_input.cfg)
   leng=${#string_inp}
@@ -191,7 +193,7 @@ function main() {
   #mv ${string_inp:0:leng-4}_TEMP.tfw ${string_inp:0:leng-4}_TEMP.pngw
 
   ciop-log "INFO" "Quicklooks generated:"
-  ls -l ${PROCESSING_HOME}/*TEMP.png* 1>&2
+  ls -l ${PROCESSING_HOME}/*TEMP*.png* 1>&2
   ciop-log "INFO" "------------------------------------------------------------"
 
 METAFILE=${PROCESSING_HOME}/${identifier}_B10_TEMP.tif.properties
