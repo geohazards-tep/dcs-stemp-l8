@@ -80,7 +80,11 @@ function generateQuicklook() {
   basename=$( basename ${input} )
   filename=${basename%.*}
 
+  ciop-log "INFO" "[generateQuicklook] ${input} - ${target} - ${filename}"
+
   /opt/anaconda/bin/gdal_translate -a_nodata 0 -scale 0 17 0 255 -of VRT ${input} ${target}/${filename}.vrt
+
+  ciop-log "INFO" "[generateQuicklook] $(ls ${target}/${filename}.vrt)"
 
   xmlstarlet ed -L -u '/VRTDataset/VRTRasterBand/ColorInterp' -v "Palette" ${target}/${filename}.vrt
   xmlstarlet ed -L -s '/VRTDataset/VRTRasterBand' -t elem -n "ColorTable" -v "" ${target}/${filename}.vrt
@@ -88,6 +92,7 @@ function generateQuicklook() {
 
   cat ${_CIOP_APPLICATION_PATH}/aux/Palette/colors.txt | while read r g b
   do
+#    ciop-log "INFO" "[generateQuicklook] doing xmlstarlet"
     xmlstarlet ed -L -s '/VRTDataset/VRTRasterBand/ColorTable' -t elem -n 'EntryTMP' -v '' \
        -i '/VRTDataset/VRTRasterBand/ColorTable/EntryTMP' -t attr -n c1 -v "${r}" \
        -i '/VRTDataset/VRTRasterBand/ColorTable/EntryTMP' -t attr -n c2 -v "${g}" \
@@ -95,7 +100,13 @@ function generateQuicklook() {
        -r '/VRTDataset/VRTRasterBand/ColorTable/EntryTMP' -v 'Entry' ${target}/${filename}.vrt
   done
 
+  ciop-log "INFO" "[generateQuicklook] doing /opt/anaconda/bin/gdal_translate -of PNG -ot Byte ${target}/${filename}.vrt ${target}/${filename}.png"
+
   /opt/anaconda/bin/gdal_translate -of PNG -ot Byte ${target}/${filename}.vrt ${target}/${filename}.png 1>&2
+
+  ciop-log "INFO" "[generateQuicklook] done with res $?"
+
+  ciop-log "INFO" "[generateQuicklook] $(ls ${target})"
 
   listgeo -tfw ${input}
   mv ${target}/${filename}.tfw ${target}/${filename}.pngw
@@ -193,7 +204,7 @@ function getData() {
 
   ciop-log "INFO" "[getData function] Data enclosure url: ${enclosure}"
 
-  local_file="$( echo ${enclosure} | ciop-copy -f -U -O ${target} - 2> /dev/null )"
+  local_file="$( echo ${enclosure} | ciop-copy -f -U -O ${target} - )"
   res=$?
   [ "${res}" -ne "0" ] && return ${ERR_GETDATA}
 
@@ -283,14 +294,19 @@ function urlResolver() {
 
   # Managing the special case for Landsat8, where we get data directly from
   # Google
+  ciop-log "INFO" "Reference ${reference}"
   landsat8=$( echo "${reference}" | grep "landsat8" )
 
-  if [ -n "${landsat8}" ]; then
+  if [ -n "${landsat8}" ]
+  then
+    ciop-log "INFO" "L8: ${landsat8}"
     read identifier path < <( opensearch-client -m EOP  "${reference}" identifier,wrsLongitudeGrid | tr "," " " )
+    identifier=$(echo ${identifier} | cut -d':' -f4)
     [ -z "${path}" ] && path="$( echo ${identifier} | cut -c 4-6)"
     row="$( echo ${identifier} | cut -c 7-9)"
 
     url="http://storage.googleapis.com/earthengine-public/landsat/L8/${path}/${row}/${identifier}.tar.bz"
+    ciop-log "INFO" "URL ${url}"
     [ -z "$( curl -s --head "${url}" | head -n 1 | grep "HTTP/1.[01] [23].." )" ] && return 1
 
     echo "${url}"

@@ -8,10 +8,10 @@
   <parent>
     <groupId>com.terradue</groupId>
     <artifactId>dcs-python-parent</artifactId>
-    <version>2.1.0-docker-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
   </parent>
   <description>Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format</description>
-  <version>1.0.4</version>
+  <version>1.0.7</version>
   <properties>
     <summary>Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format</summary>
     <description>Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format</description>
