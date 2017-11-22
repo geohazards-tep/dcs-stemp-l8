@@ -32,6 +32,7 @@ ciop-log "INFO" "Date and time: ${date}"
 ciop-log "INFO" "Reference atmospheric station: ${station}, ${region}"
 ciop-log "INFO" "Volcano name: ${volcano}"
 ciop-log "INFO" "Geometry in WKT format: ${geom}"
+ciop-log "INFO" "Hostname: $( hostname -f )"
 ciop-log "INFO" "------------------------------------------------------------"
 
 ciop-log "INFO" "Preparing the STEMP environment"
