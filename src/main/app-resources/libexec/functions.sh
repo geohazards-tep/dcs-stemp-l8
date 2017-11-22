@@ -197,7 +197,7 @@ function getData() {
     enclosure=${ref}
   else
     #enclosure=$( urlResolver "${ref}" )
-    enclosure=$( opensearch-client "${ref}" enclosure )
+    enclosure=$( opensearch-client -p do=terradue "${ref}" enclosure )
     res=$?
     [ "${res}" -ne "0" ] && ${ERR_GETDATA}
   fi
