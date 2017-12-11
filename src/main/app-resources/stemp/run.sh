@@ -89,6 +89,10 @@ function main() {
     ;;
   esac
 
+  input_b10=$( ls ${PROCESSING_HOME}/*B10.TIF )
+  leng_b10=${#input_b10}
+  identifier=$(basename ${input_b10:0:leng_b10-8})
+
   res=$?
   [ ${res} -ne 0 ] && return ${$ERR_UNCOMP}
   ciop-log "INFO" "Product uncompressed"
