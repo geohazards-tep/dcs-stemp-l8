@@ -54,6 +54,7 @@
                     <require>miniconda</require>
                     <require>MODTRAN</require>
                     <require>STEMP</require>
+                    <require>libgeotiff</require>
                   </requires>
                 </configuration>
               </execution>
