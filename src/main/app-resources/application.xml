@@ -36,6 +36,7 @@
         <parameter id="mission" title="Mission" abstract="L1B LANDSAT8 data" maxOccurs="1" scope="runtime">
           <options>
             <option>LANDSAT8</option>
+            <option>ASTER</option>
             <default>LANDSAT8</default>
           </options>
         </parameter>
