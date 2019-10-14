@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.terradue</groupId>
     <artifactId>dcs-python-parent</artifactId>
-    <version>2.1.0-docker-SNAPSHOT</version>
+    <version>3.0.1-docker</version>
   </parent>
   <description>Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format</description>
   <version>1.0.9</version>

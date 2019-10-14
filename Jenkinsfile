@@ -1,18 +1,21 @@
-def artserver = Artifactory.server('store.terradue.com')
-
 pipeline {
 
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
 
-  agent { 
+  environment {
+        PATH="/opt/anaconda/bin:$PATH"
+  }
+
+  agent {
     node {
-      label 'ci-community-docker' 
+      label 'ci-community-docker'
     }
   }
 
   stages {
+
     stage('Package & Dockerize') {
       steps {
         withMaven( maven: 'apache-maven-3.0.5' ) {
