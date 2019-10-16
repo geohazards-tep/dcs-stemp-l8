@@ -70,7 +70,7 @@ function main() {
   ciop-log "INFO" "------------------------------------------------------------"
 
   ciop-log "INFO" "Uncompressing product"
-
+  
   case ${product##*.} in
     zip)
       unzip -qq -o ${product} -d ${PROCESSING_HOME}
@@ -83,13 +83,17 @@ function main() {
     bz2 | bz)
       tar xjf ${product} -C ${PROCESSING_HOME}
     ;;
+    
+    hdf)
+      ciop-log "INFO" "Uncompressed "${product##*.}" format"
+    ;;
     *)
       ciop-log "ERROR" "Unsupported "${product##*.}" format"
       return ${$ERR_UNCOMP}
     ;;
   esac
 
- identifier=$(find ${PROCESSING_HOME} -name "*_MTL.txt" -printf "%f\n" | cut -d '_' -f1-7)
+ #identifier=$(find ${PROCESSING_HOME} -name "*_MTL.txt" -printf "%f\n" | cut -d '_' -f1-7)
 
   res=$?
   [ ${res} -ne 0 ] && return ${$ERR_UNCOMP}
@@ -107,9 +111,11 @@ function main() {
 
   case ${mission,,} in
     landsat8)
+        identifier=$(find ${PROCESSING_HOME} -name "*_MTL.txt" -printf "%f\n" | cut -d '_' -f1-7)
         UTM_ZONE=$( sed -n 's#^.*UTM_ZONE\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt )
     ;;
     aster)
+        identifier=$(find -name "*.hdf" -printf "%f\n" | cut -d '.' -f1)
         UTM_ZONE=$( gdalinfo ${PROCESSING_HOME}/${identifier}.hdf | sed -n 's#.*UTMZONENUMBER=\(.*\)#\1#p' )
     ;;
   esac
