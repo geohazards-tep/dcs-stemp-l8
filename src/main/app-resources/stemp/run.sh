@@ -199,7 +199,7 @@ function main() {
   #mv ${string_inp:0:leng-4}_TEMP.tfw ${string_inp:0:leng-4}_TEMP.pngw
 
   ciop-log "INFO" "Quicklooks generated:"
-  ls -l ${PROCESSING_HOME}/*TEMP.png* 1>&2
+  ls -l ${PROCESSING_HOME}/*TEMP*.png* 1>&2
   ciop-log "INFO" "------------------------------------------------------------"
 
 
