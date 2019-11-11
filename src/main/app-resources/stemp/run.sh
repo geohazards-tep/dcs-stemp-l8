@@ -230,10 +230,51 @@ function main() {
   ciop-log "INFO" "Results staged out"
   ciop-log "INFO" "------------------------------------------------------------"
 
-  ciop-log "INFO" "Cleaning STEMP environment"
-  rm -rf ${PROCESSING_HOME}/*
-  ciop-log "INFO" "------------------------------------------------------------"
-  ciop-log "INFO" "**** STEMP node finished ****"
+METAFILE=${PROCESSING_HOME}/${identifier}_B10_TEMP-${volcano}.tif.properties
+SATELLITE=$(sed -n 's#^.*SPACECRAFT_ID\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt)
+DATATIME=$(sed -n 's#^.*FILE_DATE\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt)
+SCENE=$(sed -n 's#^.*LANDSAT_SCENE_ID\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt)
+
+ciop_log "DEBUG" "$(ls -latr ${PROCESSING_HOME}/)"
+
+if [ "${mission,,}" = "aster" ]; then
+  SATELLITE=$(gdalinfo ${PROCESSING_HOME}/${identifier}.hdf | grep SOURCEDATAPRODUCT | sed -n 's#^.*SOURCEDATAPRODUCT=\(.*\) .*,.*$#\1#p'  | cut -d' ' -f1)
+  DT=$(echo ${PROCESSING_HOME}/${identifier}.hdf | cut -d'_' -f3)
+  DATATIME="${DT:7:4}-${DT:5:2}-${DT:3:2}T${DT::11:2}:${DT::13:2}:${DT::15:2}"
+  SCENE=$(gdalinfo ${PROCESSING_HOME}/${identifier}.hdf | grep ASTERSCENEID | sed -n 's#^.*ASTERSCENEID=\(.*\)$#\1#p')
+fi
+echo "#Predefined Metadata" >> ${METAFILE}
+echo "title=STEMP - Surface Temperature Map - ${SCENE:1:21}" - ${DATATIME} >> ${METAFILE}
+echo "date=${DATATIME}" >> ${METAFILE}
+echo "Volcano=${volcano}" >> ${METAFILE}
+echo "#Input scene" >> ${METAFILE}
+echo "Satellite=${SATELLITE:1:9}" >> ${METAFILE}
+echo "Scene=${SCENE:1:21}" >> ${METAFILE}
+echo "#STEMP Parameters" >> ${METAFILE}
+echo "Emissivity=ASTER05" >> ${METAFILE}
+echo "Atmospheric\ Profile=${profile}" >> ${METAFILE}
+echo "DEM\ Spatial\ Resolution=90mt" >> ${METAFILE}
+echo "Temperature\ Unit=degree" >> ${METAFILE}
+if [ "${mission,,}" = "aster" ]; then
+  echo "image_url=https://store.terradue.com/api/ingv-stemp/images/colorbar-aster.png" >> ${METAFILE}
+else
+  echo "image_url=https://store.terradue.com/api/ingv-stemp/images/colorbar-stemp-l8.png" >> ${METAFILE}
+fi
+echo "#EOF" >> ${METAFILE}
+
+ciop-log "INFO" "Staging-out results ..."
+ciop-publish -m ${PROCESSING_HOME}/*TEMP-${volcano}.tif || return $?
+ciop-publish -m ${PROCESSING_HOME}/*TEMP*.png* || return $?
+ciop-publish -m ${METAFILE} || return $?
+[ ${res} -ne 0 ] && return ${ERR_PUBLISH}
+
+ciop-log "INFO" "Results staged out"
+ciop-log "INFO" "------------------------------------------------------------"
+
+ciop-log "INFO" "Cleaning STEMP environment"
+rm -rf ${PROCESSING_HOME}/*
+ciop-log "INFO" "------------------------------------------------------------"
+ciop-log "INFO" "**** STEMP node finished ****"
 }
 
 while IFS=',' read ref identifier mission date station region volcano geom
