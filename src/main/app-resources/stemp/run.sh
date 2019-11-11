@@ -208,12 +208,10 @@ SATELLITE=$(sed -n 's#^.*SPACECRAFT_ID\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${id
 DATATIME=$(sed -n 's#^.*FILE_DATE\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt)
 SCENE=$(sed -n 's#^.*LANDSAT_SCENE_ID\s=\s\(.*\)$#\1#p' ${PROCESSING_HOME}/${identifier}_MTL.txt)
 
-ciop_log "DEBUG" "$(ls -latr ${PROCESSING_HOME}/)"
-
 if [ "${mission,,}" = "aster" ]; then
   SATELLITE=$(gdalinfo ${PROCESSING_HOME}/${identifier}.hdf | grep SOURCEDATAPRODUCT | sed -n 's#^.*SOURCEDATAPRODUCT=\(.*\) .*,.*$#\1#p'  | cut -d' ' -f1)
   DT=$(echo ${PROCESSING_HOME}/${identifier}.hdf | cut -d'_' -f3)
-  DATATIME="${DT:7:4}-${DT:5:2}-${DT:3:2}T${DT::11:2}:${DT::13:2}:${DT::15:2}"
+  DATATIME="${DT:7:4}-${DT:5:2}-${DT:3:2}T${DT:11:2}:${DT:13:2}:${DT:15:2}"
   SCENE=$(gdalinfo ${PROCESSING_HOME}/${identifier}.hdf | grep ASTERSCENEID | sed -n 's#^.*ASTERSCENEID=\(.*\)$#\1#p')
 fi
 echo "#Predefined Metadata" >> ${METAFILE}
