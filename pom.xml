@@ -11,7 +11,7 @@
     <version>2.0.0</version>
   </parent>
   <description>Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format</description>
-  <version>1.1.6-SNAPSHOT</version>
+  <version>1.1.6</version>
   <properties>
     <summary>Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format</summary>
     <description>Land surface temperature map (Celsius degrees) obtained by multi-spectral optical sensors (LANDSAT8) generated in GeoTIFF format</description>
